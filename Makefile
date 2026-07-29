@@ -8,6 +8,9 @@ test:
 	  python3 "$$test_file"; \
 	done
 
+assets:
+	@python3 assets/build.gpt.py
+
 check: compile test
 
-.PHONY: compile test check
+.PHONY: compile test assets check

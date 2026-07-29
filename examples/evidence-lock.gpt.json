@@ -1,0 +1,25 @@
+{
+  "files": {
+    "README.md": "cb7febb74b3f740ea4c93360cad846c27fed7e273becfaee5f01c1138ca6e624",
+    "CONTRIBUTING.md": "ac652a8e425f020de05874921bb22ce1634b7e5d4949ee670cec7aa57a9e44ce",
+    "SECURITY.md": "bbd2a1316c46b1fe6b338ec651f0a066b2a26aac31de95a44ca6308e16c8be4f",
+    "LICENSE": "a2d0cb3e05de7076e42008eaf368cbac2bc0ed88e226f4ffc019bdd7dd5b7d90",
+    "skill/SKILL.md": "2b4d24cae573063c658d900b49f86e513b05b4651dcec36cb9eb01688fea2eb8",
+    "examples/README.md": "30a2398d32f5e154e117e807f8a6b7c67bda29f4014f13a6b04a5a426271d6ef",
+    "examples/curated/README.md": "8e35b77dc50eeebcd480eb277ead01aca6735e94822531a25c6e03a88402d9fa",
+    "examples/curated/manifest.gpt.json": "48eca3abbf8036d9802df75204e26b0267c1f2c62da029039ced6d476b93bd86",
+    "examples/curated/release-readiness.gpt.md": "aa3d32f74e85e95d1d2f4cd7a151001451d773c90f0c71cd251ce072745acbe7",
+    "examples/curated/index.html": "435945db2e40cef378a676f0dd8c1fd19b0ac91ef944d288e2eac4b9dd2902d3",
+    "examples/curated/run.gpt.md": "dc3011a23d7174744885abe617ded08bdd3cfe9f984fa17da921033f2eeb9df1",
+    "examples/formal/README.md": "cd8b73718187e0cab066452404fe1099afde152008311bcd6001ec02c912b53f",
+    "examples/formal/manifest.gpt.json": "7b7636c6c7dfc0967bbe1aa2ea69076d703d398c2a759fcc9f0937a87fac3eac",
+    "examples/formal/delivery-brief.gpt.md": "e0df178f7a7e167d936b2bc21a1d1267f7d5488036d7eed43d93cae7e2a0f221",
+    "examples/formal/delivery-brief.html": "397834cef69b80afe9987dd16e54b18d6d0aa8f4c8eec71d5cbe8ac4b699cea2",
+    "examples/formal/delivery-brief.pdf": "a8269357e87cf25ce5723f292cecad98e06e274092212cfc6a1d65c929d63762",
+    "assets/build.gpt.py": "faf5eba84301b9a638ff7abce226a1e786888c899bafb68b4420499bf65b3f7a",
+    "assets/social-preview.gpt.html": "73158de2c043db0a2aa8fa02cd0f8c01dad5e7c65d01a2fcf27c862349b1d382",
+    "assets/demo.gif": "967b8d3d7ec81e9e6efec3815ea24fb83315c047aae4ff58834d35ba8fcbcfe3",
+    "assets/demo-poster.png": "287b7fb0fa98a888ea19171fe4772aed3f3c86a9d7f2b81311dc89c956d3d6f9",
+    "assets/social-preview.png": "a2cc4f6ce80cb173a495654115fba439b5c99ca411cfd022f11d38d16a0a8d1e"
+  }
+}

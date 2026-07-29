@@ -1,0 +1,15 @@
+{
+  "mode": "curated",
+  "input_commit": "7a074c7",
+  "skill_sha256": "2b4d24cae573063c658d900b49f86e513b05b4651dcec36cb9eb01688fea2eb8",
+  "agent": "OpenAI Codex",
+  "agent_version": "codex-cli 0.146.0",
+  "invocation": "npx -y @openai/codex --yolo exec -o examples/curated/run.gpt.md \"Use skill/SKILL.md in curated mode to render examples/curated/release-readiness.gpt.md as examples/curated/index.html\"",
+  "date": "2026-07-28",
+  "edited": false,
+  "files": {
+    "examples/curated/release-readiness.gpt.md": "aa3d32f74e85e95d1d2f4cd7a151001451d773c90f0c71cd251ce072745acbe7",
+    "examples/curated/index.html": "435945db2e40cef378a676f0dd8c1fd19b0ac91ef944d288e2eac4b9dd2902d3",
+    "examples/curated/run.gpt.md": "dc3011a23d7174744885abe617ded08bdd3cfe9f984fa17da921033f2eeb9df1"
+  }
+}

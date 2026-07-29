@@ -1,0 +1,17 @@
+{
+  "mode": "formal",
+  "input_commit": "7a074c7",
+  "skill_sha256": "2b4d24cae573063c658d900b49f86e513b05b4651dcec36cb9eb01688fea2eb8",
+  "agent": "Python",
+  "agent_version": "Python 3.14.6",
+  "invocation": "python3 skill/scripts/formal_render.py examples/formal/delivery-brief.gpt.md --html examples/formal/delivery-brief.html --pdf examples/formal/delivery-brief.pdf",
+  "date": "2026-07-28",
+  "edited": false,
+  "pdf_backend": "chrome",
+  "pdf_pages": 1,
+  "files": {
+    "examples/formal/delivery-brief.gpt.md": "e0df178f7a7e167d936b2bc21a1d1267f7d5488036d7eed43d93cae7e2a0f221",
+    "examples/formal/delivery-brief.html": "397834cef69b80afe9987dd16e54b18d6d0aa8f4c8eec71d5cbe8ac4b699cea2",
+    "examples/formal/delivery-brief.pdf": "a8269357e87cf25ce5723f292cecad98e06e274092212cfc6a1d65c929d63762"
+  }
+}
