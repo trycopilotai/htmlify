@@ -137,9 +137,10 @@ Invoke it as `$htmlify`.
 
 The source checkout on `main` also carries Claude Code and
 Codex plugin manifests at development version
-`0.2.0-dev.0`. They discover the same canonical
-`skill/SKILL.md`; those manifests are not part of the
-`v0.1.0` tag.
+`0.2.0-dev.0`. `skill/SKILL.md` resolves to the package both
+runtimes load under `skills/htmlify`, so the skill content
+is stored once. Those manifests are not part of the `v0.1.0`
+tag.
 
 For either agent, ask it to visualize, compare, dashboard,
 timeline, inspect, render, print, or export Markdown. Ask
