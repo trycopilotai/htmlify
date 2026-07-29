@@ -1,11 +1,13 @@
 ---
 name: htmlify
 description: >-
-  Turn dense Markdown into source-checked HTML decision
-  surfaces or deterministic formal HTML with optional PDF
-  export. Use when the user asks to visualize, compare,
-  dashboard, calendarize, timeline, inspect, or print
-  Markdown planning, design, analysis, or source documents.
+  Turn dense Markdown into source-checked HTML timelines,
+  decision surfaces, system explainers, visual progressions,
+  evidence reviews, or deterministic formal HTML with
+  optional PDF export. Use when the user asks to visualize,
+  compare, dashboard, calendarize, timeline, explain,
+  inspect, render, or print Markdown planning, design,
+  analysis, research, status, or source documents.
 ---
 
 # htmlify
@@ -36,6 +38,8 @@ output without a separate instruction.
 Use curated mode when the value comes from interpretation:
 
 - timelines, milestones, owner lanes, or roadmaps;
+- system boundaries, operational flows, or status evidence;
+- visual progressions, specimens, or stage comparisons;
 - comparisons, audits, and grouped table summaries;
 - plans that mix commitments, demonstrations, deferrals,
   risks, and open decisions;
@@ -46,6 +50,7 @@ Use formal mode when the source already has the intended
 meaning and needs a clean printable presentation:
 
 - executive memos and briefs;
+- research reviews and evidence reports;
 - meeting notes or status updates;
 - Markdown tables, lists, quotes, and code that should
   retain their source order.
@@ -60,7 +65,9 @@ render, printout, or PDF.
    targeted reads.
 2. Extract a small structured model before designing: dates,
    phases, milestones, groups, completion states, owners,
-   gates, risks, and unresolved decisions.
+   gates, risks, unresolved decisions, relationships,
+   boundaries, flows, referenced assets, and source
+   hierarchy.
 3. State the main interpretation at the top. Visually
    separate sourced facts from the interpretation.
 4. Build the smallest useful page. Default to one
@@ -72,6 +79,21 @@ render, printout, or PDF.
 Write curated output to the platform's temporary directory
 unless the user asks for a durable artifact. Use a
 descriptive directory and report its exact path.
+
+Choose one primary output shape:
+
+- **Temporal plan:** phase backbone, milestone cutoffs,
+  near-term agenda, and completion gates.
+- **System explainer:** ordered flow, explicit boundaries,
+  state summary, and verification evidence.
+- **Visual progression:** comparable stages, specimens,
+  annotations, and a concise account of what changed.
+- **Decision or evidence review:** conclusion, source
+  hierarchy, findings, limitations, and dense supporting
+  material.
+
+Do not combine multiple visual metaphors when one shape can
+carry the source's meaning.
 
 Useful patterns include:
 
@@ -88,6 +110,11 @@ Use semantic headings and tables, stable dimensions, native
 text, high contrast, and color that communicates meaning.
 Avoid tiny labels, decorative marketing layouts, and
 JavaScript that is more complex than the interaction needs.
+
+Keep curated output self-contained by default. If a visual
+progression depends on several image assets and embedding
+them would make the HTML impractical, keep the assets
+adjacent, use relative paths, and verify every reference.
 
 ## Formal mode
 
@@ -139,6 +166,16 @@ Only pass trusted HTML to the standalone PDF script. A PDF
 backend is an external program and arbitrary HTML can refer
 to local or network resources.
 
+## Paired renderings
+
+When the user requests both modes from one source, keep the
+source facts identical. Let formal mode preserve order and
+let curated mode reinterpret structure without introducing
+new claims.
+
+When demonstrating the workflow, present the states in this
+order: source Markdown, formal HTML, rich curated HTML.
+
 ## Verification
 
 Before reporting:
@@ -149,8 +186,12 @@ Before reporting:
    contains JavaScript.
 4. Open the rendered page and inspect the first viewport,
    overflow, tables, links, and print layout.
-5. If PDF was requested, record the backend and page count.
-6. State which source files were used and whether any
+5. Verify every referenced local asset exists and every
+   outward-facing path is repository-relative.
+6. For paired renderings, compare both outputs against the
+   same source and check for factual drift.
+7. If PDF was requested, record the backend and page count.
+8. State which source files were used and whether any
    repository-tracked file changed.
 
 ## Reporting
@@ -161,6 +202,6 @@ interpretations introduced by the visualization.
 
 Public documentation:
 
-- https://github.com/trycopilotai/htmlify/blob/v0.1.0/README.md
-- https://github.com/trycopilotai/htmlify/blob/v0.1.0/examples/README.md
-- https://github.com/trycopilotai/htmlify/blob/v0.1.0/SECURITY.md
+- https://github.com/trycopilotai/htmlify/blob/main/README.md
+- https://github.com/trycopilotai/htmlify/blob/main/examples/README.md
+- https://github.com/trycopilotai/htmlify/blob/main/SECURITY.md
