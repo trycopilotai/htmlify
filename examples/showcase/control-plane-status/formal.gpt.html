@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cross-machine Release Control Path</title>
+    <style>
+@page {
+  size: Letter;
+  margin: 0;
+}
+:root {
+  color-scheme: light;
+  --ink: #000;
+  --muted: #444;
+  --rule: #b8b8b8;
+  --soft: #f1f1f1;
+  --paper: #fff;
+  --accent: #000;
+  --accent-soft: #f4f4f4;
+}
+* {
+  box-sizing: border-box;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+html {
+  background: #e6e6e6;
+  color: var(--ink);
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.43;
+}
+body {
+  margin: 0;
+  padding: 24px 0;
+}
+main.paper {
+  position: relative;
+  width: 8.5in;
+  min-height: 11in;
+  margin: 0 auto;
+  padding: 0.5in 0.68in 0.62in;
+  background: var(--paper);
+  border-top: 8px solid var(--accent);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.18);
+}
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: #000;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1.16;
+}
+h1 {
+  max-width: 6.8in;
+  margin-bottom: 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+h2 {
+  margin-top: 24px;
+  border-top: 2px solid #000;
+  padding-top: 12px;
+  font-size: 16px;
+  break-after: avoid;
+}
+h2.appendix {
+  break-before: auto;
+}
+h3 {
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  break-after: avoid;
+}
+p,
+ul,
+ol {
+  margin: 8.5px 0;
+}
+ul,
+ol {
+  padding-left: 20px;
+}
+li {
+  margin: 4.5px 0;
+}
+strong {
+  color: #000;
+}
+main.paper > h1 + p {
+  margin: 12px 0 18px;
+  padding: 11px 13px;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  color: #000;
+  font-size: 12px;
+}
+.table-wrap {
+  width: 100%;
+  overflow: visible;
+  margin: 10px 0 15px;
+  break-inside: avoid;
+}
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  font-size: 12px;
+  line-height: 1.3;
+}
+th,
+td {
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  padding: 5.5px 6.5px;
+  vertical-align: top;
+}
+th + th,
+td + td {
+  border-left: 1px solid var(--rule);
+}
+th {
+  background: var(--soft);
+  font-weight: 700;
+  color: #000;
+}
+tr:nth-child(even) td {
+  background: #f8f8f8;
+}
+tr:last-child td {
+  border-bottom: 0;
+}
+tr {
+  break-inside: avoid;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 9px 13px;
+  border-left: 4px solid var(--accent);
+  background: #fafafa;
+}
+blockquote p {
+  margin: 6px 0;
+}
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 18px 0;
+}
+pre {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+code {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+}
+a {
+  color: #000;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+@media print {
+  html,
+  body {
+    background: #fff;
+    padding: 0;
+  }
+  main.paper {
+    width: auto;
+    min-height: 0;
+    box-shadow: none;
+    margin: 0;
+    border-top: 8px solid var(--accent);
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <main class="paper">
+<h1>Cross-machine Release Control Path</h1>
+<p><strong>Status:</strong> Operational through request and status reporting. Release remains on hold until digest verification and restart evidence are complete.</p>
+<h2>Control path</h2>
+<ol>
+<li>The workstation writes a durable release request.</li>
+<li>The authenticated relay forwards the request identifier.</li>
+<li>The build worker reads the request and records progress.</li>
+<li>The worker publishes a digest-pinned candidate.</li>
+<li>The workstation reads the durable status record.</li>
+</ol>
+<h2>Boundaries</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align:left">Boundary</th><th style="text-align:left">Responsibility</th><th style="text-align:left">Durable evidence</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align:left">Workstation</td><td style="text-align:left">Create request and inspect status</td><td style="text-align:left">Request identifier</td></tr>
+<tr><td style="text-align:left">Relay</td><td style="text-align:left">Authenticate and forward</td><td style="text-align:left">Reachability result</td></tr>
+<tr><td style="text-align:left">Build worker</td><td style="text-align:left">Build, test, and publish</td><td style="text-align:left">Job and test record</td></tr>
+<tr><td style="text-align:left">Artifact registry</td><td style="text-align:left">Store the candidate</td><td style="text-align:left">Candidate digest</td></tr>
+<tr><td style="text-align:left">Service host</td><td style="text-align:left">Restart the pinned candidate</td><td style="text-align:left">Restart result</td></tr>
+</tbody>
+</table>
+</div>
+<h2>Current evidence</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align:left">Check</th><th style="text-align:left">State</th><th style="text-align:left">Evidence</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align:left">Request record</td><td style="text-align:left">Pass</td><td style="text-align:left">Identifier and creation time recorded</td></tr>
+<tr><td style="text-align:left">Relay reachability</td><td style="text-align:left">Pass</td><td style="text-align:left">Authenticated probe completed</td></tr>
+<tr><td style="text-align:left">Worker job</td><td style="text-align:left">Pass</td><td style="text-align:left">Build and test result recorded</td></tr>
+<tr><td style="text-align:left">Candidate digest</td><td style="text-align:left">Pending</td><td style="text-align:left">Registry and status digests must match</td></tr>
+<tr><td style="text-align:left">Service restart</td><td style="text-align:left">Pending</td><td style="text-align:left">Restart result has not been recorded</td></tr>
+</tbody>
+</table>
+</div>
+<h2>Release sequence</h2>
+<ol>
+<li>Compare the candidate digest with the durable status.</li>
+<li>Restart the service with the matching digest.</li>
+<li>Record the restart result and final probe.</li>
+</ol>
+<h2>Reading rule</h2>
+<p>Treat live process output as supporting evidence. Treat the durable request, status, digest, and restart records as the release record.</p>
+<h2>Source note</h2>
+<p>This is synthetic example material created to demonstrate HTMLify. It does not describe a real control plane.</p>
+    </main>
+  </body>
+</html>

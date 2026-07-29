@@ -1,7 +1,7 @@
 {
   "mode": "curated",
   "input_commit": "7a074c7",
-  "skill_sha256": "2b4d24cae573063c658d900b49f86e513b05b4651dcec36cb9eb01688fea2eb8",
+  "skill_sha256": "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded9704aaaf0d8185d64c8a7",
   "agent": "OpenAI Codex",
   "agent_version": "codex-cli 0.146.0",
   "invocation": "npx -y @openai/codex --yolo exec -o examples/curated/run.gpt.md \"Use skill/SKILL.md in curated mode to render examples/curated/release-readiness.gpt.md as examples/curated/index.html\"",

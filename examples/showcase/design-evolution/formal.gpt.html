@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interface Typography Evolution Study</title>
+    <style>
+@page {
+  size: Letter;
+  margin: 0;
+}
+:root {
+  color-scheme: light;
+  --ink: #000;
+  --muted: #444;
+  --rule: #b8b8b8;
+  --soft: #f1f1f1;
+  --paper: #fff;
+  --accent: #000;
+  --accent-soft: #f4f4f4;
+}
+* {
+  box-sizing: border-box;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+html {
+  background: #e6e6e6;
+  color: var(--ink);
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.43;
+}
+body {
+  margin: 0;
+  padding: 24px 0;
+}
+main.paper {
+  position: relative;
+  width: 8.5in;
+  min-height: 11in;
+  margin: 0 auto;
+  padding: 0.5in 0.68in 0.62in;
+  background: var(--paper);
+  border-top: 8px solid var(--accent);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.18);
+}
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: #000;
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1.16;
+}
+h1 {
+  max-width: 6.8in;
+  margin-bottom: 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+h2 {
+  margin-top: 24px;
+  border-top: 2px solid #000;
+  padding-top: 12px;
+  font-size: 16px;
+  break-after: avoid;
+}
+h2.appendix {
+  break-before: auto;
+}
+h3 {
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  break-after: avoid;
+}
+p,
+ul,
+ol {
+  margin: 8.5px 0;
+}
+ul,
+ol {
+  padding-left: 20px;
+}
+li {
+  margin: 4.5px 0;
+}
+strong {
+  color: #000;
+}
+main.paper > h1 + p {
+  margin: 12px 0 18px;
+  padding: 11px 13px;
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  color: #000;
+  font-size: 12px;
+}
+.table-wrap {
+  width: 100%;
+  overflow: visible;
+  margin: 10px 0 15px;
+  break-inside: avoid;
+}
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  font-size: 12px;
+  line-height: 1.3;
+}
+th,
+td {
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  padding: 5.5px 6.5px;
+  vertical-align: top;
+}
+th + th,
+td + td {
+  border-left: 1px solid var(--rule);
+}
+th {
+  background: var(--soft);
+  font-weight: 700;
+  color: #000;
+}
+tr:nth-child(even) td {
+  background: #f8f8f8;
+}
+tr:last-child td {
+  border-bottom: 0;
+}
+tr {
+  break-inside: avoid;
+}
+blockquote {
+  margin: 12px 0;
+  padding: 9px 13px;
+  border-left: 4px solid var(--accent);
+  background: #fafafa;
+}
+blockquote p {
+  margin: 6px 0;
+}
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 18px 0;
+}
+pre {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+code {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+}
+a {
+  color: #000;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+@media print {
+  html,
+  body {
+    background: #fff;
+    padding: 0;
+  }
+  main.paper {
+    width: auto;
+    min-height: 0;
+    box-shadow: none;
+    margin: 0;
+    border-top: 8px solid var(--accent);
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <main class="paper">
+<h1>Interface Typography Evolution Study</h1>
+<h2>Research question</h2>
+<p>Can a compact interface type system retain a technical character while becoming easier to read at small sizes?</p>
+<h2>Evidence reviewed</h2>
+<ul>
+<li>Specimens at 12, 16, and 32 pixels.</li>
+<li>Repeated strings containing <code>0</code>, <code>O</code>, <code>1</code>, <code>I</code>, and <code>l</code>.</li>
+<li>Three retained design checkpoints.</li>
+</ul>
+<h2>Checkpoints</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th style="text-align:left">Stage</th><th style="text-align:left">System state</th><th style="text-align:left">Finding</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align:left">Draft</td><td style="text-align:left">One width and a heavy default weight</td><td style="text-align:left">Strong texture, but dense at 12 pixels</td></tr>
+<tr><td style="text-align:left">System</td><td style="text-align:left">Width and weight tokens introduced</td><td style="text-align:left">Better hierarchy; optical centers unresolved</td></tr>
+<tr><td style="text-align:left">Final</td><td style="text-align:left">Centers corrected and small-size grid aligned</td><td style="text-align:left">Distinctions remain visible at all reviewed sizes</td></tr>
+</tbody>
+</table>
+</div>
+<h2>Findings</h2>
+<ol>
+<li>Reducing the default weight opens counters at 12 pixels.</li>
+<li>Width tokens separate labels from compact data strings.</li>
+<li>Corrected optical centers stabilize rounded glyphs.</li>
+<li>Integer-grid alignment improves the retained small-size specimens.</li>
+</ol>
+<h2>Decision</h2>
+<p>Use the final checkpoint for interface labels and data strings. Retain the draft and system checkpoints as comparison evidence.</p>
+<h2>Limitations</h2>
+<ul>
+<li>The review covers static specimens, not animated text.</li>
+<li>The review covers three sizes and one interface context.</li>
+<li>The example does not establish accessibility compliance.</li>
+</ul>
+<h2>Source note</h2>
+<p>This is synthetic example material created to demonstrate HTMLify. It does not describe a released typeface.</p>
+    </main>
+  </body>
+</html>

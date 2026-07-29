@@ -1,7 +1,7 @@
 {
   "mode": "formal",
   "input_commit": "7a074c7",
-  "skill_sha256": "2b4d24cae573063c658d900b49f86e513b05b4651dcec36cb9eb01688fea2eb8",
+  "skill_sha256": "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded9704aaaf0d8185d64c8a7",
   "agent": "Python",
   "agent_version": "Python 3.14.6",
   "invocation": "python3 skill/scripts/formal_render.py examples/formal/delivery-brief.gpt.md --html examples/formal/delivery-brief.html --pdf examples/formal/delivery-brief.pdf",
