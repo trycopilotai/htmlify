@@ -1,49 +1,105 @@
 # htmlify
 
-Turn dense Markdown into a source-checked HTML decision
-surface, or render it as deterministic formal HTML with
-optional PDF export.
+Turn dense Markdown into deterministic formal HTML or a
+source-checked rich decision surface, with optional PDF
+export.
 
 `htmlify` gives an agent two explicit modes:
 
-- **Curated mode** extracts dates, decisions, risks, owners,
-  and other useful structure into a focused visualization.
 - **Formal mode** preserves the source order through a
   standard-library Markdown-to-HTML renderer and an optional
   external PDF backend.
+- **Curated mode** extracts dates, decisions, risks, owners,
+  relationships, and other useful structure into rich HTML.
 
 The distinction is the contract. A request to visualize a
 plan should not receive a decorated Markdown preview. A
 request to print an existing memo should not receive an
 agent's reinterpretation of it.
 
-## See it run
+## Source → formal → rich
 
-The committed examples cover both modes:
+Each animation begins with the committed Markdown source,
+moves to the order-preserving formal render, and ends with a
+rich rendering of the same facts. Its four-second loop holds
+source for one beat, formal for one beat, and rich for two
+beats.
 
-- [curated decision surface](examples/curated/README.md);
-- [formal HTML and PDF render](examples/formal/README.md).
+### Publication sprint
 
-The demo is reconstructed from those committed artifacts:
+A dated plan becomes a printable brief, then a timeline with
+phase state, near-term agenda, and submission gates.
+
+[Source Markdown](examples/showcase/publication-sprint/source.gpt.md)
+→
+[formal HTML](examples/showcase/publication-sprint/formal.gpt.html)
+→
+[rich HTML](examples/showcase/publication-sprint/rich.gpt.html)
 
 <picture>
   <source
     media="(prefers-reduced-motion: reduce)"
-    srcset="assets/demo-poster.png"
+    srcset="assets/publication-sprint-poster.gpt.png"
   >
   <img
-    src="assets/demo.gif"
-    alt="The same source workflow rendered as a curated decision surface and as a formal printable document"
+    src="assets/publication-sprint.gpt.gif"
+    alt="A publication sprint moving from source Markdown to formal HTML to a rich timeline"
+  >
+</picture>
+
+### Cross-machine control plane
+
+A release status note becomes a printable system record,
+then a control-path view with boundaries, evidence, and the
+remaining hold.
+
+[Source Markdown](examples/showcase/control-plane-status/source.gpt.md)
+→
+[formal HTML](examples/showcase/control-plane-status/formal.gpt.html)
+→
+[rich HTML](examples/showcase/control-plane-status/rich.gpt.html)
+
+<picture>
+  <source
+    media="(prefers-reduced-motion: reduce)"
+    srcset="assets/control-plane-status-poster.gpt.png"
+  >
+  <img
+    src="assets/control-plane-status.gpt.gif"
+    alt="A control-plane status note moving from source Markdown to formal HTML to a rich system view"
+  >
+</picture>
+
+### Interface typography evolution
+
+A compact evidence review becomes a formal study, then a
+visual progression across three retained design checkpoints.
+
+[Source Markdown](examples/showcase/design-evolution/source.gpt.md)
+→
+[formal HTML](examples/showcase/design-evolution/formal.gpt.html)
+→
+[rich HTML](examples/showcase/design-evolution/rich.gpt.html)
+
+<picture>
+  <source
+    media="(prefers-reduced-motion: reduce)"
+    srcset="assets/design-evolution-poster.gpt.png"
+  >
+  <img
+    src="assets/design-evolution.gpt.gif"
+    alt="A typography study moving from source Markdown to formal HTML to a rich visual progression"
   >
 </picture>
 
 ## Use it
 
-Install the pinned package as a Claude Code skill:
+Install the current package from `main` as a Claude Code
+skill:
 
 ```sh
 install_tmp="$(mktemp -d)" \
-  && git clone --quiet --depth 1 --branch v0.1.0 \
+  && git clone --quiet --depth 1 --branch main \
        https://github.com/trycopilotai/htmlify \
        "$install_tmp/htmlify" \
   && mkdir -p ~/.claude/skills/htmlify \
@@ -61,7 +117,9 @@ Or install it from the trycopilot.ai marketplace:
 
 Invoke `htmlify` by name or ask the agent to visualize,
 compare, dashboard, timeline, inspect, render, print, or
-export Markdown.
+export Markdown. Ask for formal output when source order is
+the priority, or rich output when relationships and
+decisions should become a visual surface.
 
 Read [`skill/SKILL.md`](skill/SKILL.md) before installing.
 The skill writes files and may open a browser, start a local
@@ -105,10 +163,15 @@ source.
 
 ## Evidence
 
-Every worked example records its input commit, skill hash,
-agent and version, invocation, date, output hashes, and
-whether the output was edited. Tests recompute the hashes
-and fail when prose, generated assets, or manifests drift.
+The release-evidence examples record their input commit,
+skill hash, agent and version, invocation, date, output
+hashes, and whether the output was edited. Tests recompute
+the hashes and fail when prose, generated assets, or
+manifests drift.
+
+The three synthetic showcases commit their source, formal
+HTML, and rich HTML together. `make assets` rebuilds each
+three-frame animation in that order.
 
 See [the evidence summary](examples/README.md).
 

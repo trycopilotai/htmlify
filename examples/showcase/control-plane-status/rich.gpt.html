@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cross-machine Release Control Path — Rich HTML</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #eef6ff;
+        --muted: #93a7bc;
+        --line: rgba(157, 187, 215, 0.18);
+        --panel: rgba(17, 33, 49, 0.92);
+        --panel-strong: #13283a;
+        --canvas: #07131f;
+        --cyan: #42d2e8;
+        --blue: #6ca4ff;
+        --green: #55d79e;
+        --amber: #ffbd66;
+        --red: #ff7285;
+        --shadow: 0 24px 72px rgba(0, 0, 0, 0.34);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 75% -10%, #143f5c 0, transparent 36rem),
+          radial-gradient(circle at 0 50%, #102a3d 0, transparent 28rem),
+          var(--canvas);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.45;
+      }
+
+      main {
+        width: min(1200px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 28px 0 64px;
+      }
+
+      header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 30px;
+        margin-bottom: 18px;
+      }
+
+      .eyebrow,
+      .stamp,
+      .state,
+      th {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow {
+        color: var(--cyan);
+      }
+
+      h1 {
+        max-width: 760px;
+        margin: 5px 0 0;
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 1.02;
+        letter-spacing: -0.05em;
+      }
+
+      .stamp {
+        color: var(--muted);
+        text-align: right;
+      }
+
+      .status {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 18px;
+        align-items: center;
+        padding: 16px 18px;
+        border: 1px solid rgba(255, 189, 102, 0.36);
+        border-radius: 16px;
+        background: rgba(86, 59, 21, 0.42);
+        box-shadow: var(--shadow);
+      }
+
+      .status-mark {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 0 8px rgba(255, 189, 102, 0.12);
+      }
+
+      .status strong {
+        display: block;
+        margin-bottom: 2px;
+        font-size: 17px;
+      }
+
+      .status p,
+      .node p,
+      .node small {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .hold {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--amber);
+        color: #35230a;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 20px;
+        margin: 26px 2px 12px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+
+      .section-head span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .path {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 22px;
+      }
+
+      .node {
+        position: relative;
+        min-height: 164px;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background:
+          linear-gradient(160deg, rgba(72, 145, 193, 0.13), transparent 55%),
+          var(--panel);
+        box-shadow: 0 15px 38px rgba(0, 0, 0, 0.18);
+      }
+
+      .node:not(:last-child)::after {
+        position: absolute;
+        top: 50%;
+        right: -18px;
+        width: 14px;
+        height: 2px;
+        background: var(--cyan);
+        content: "";
+      }
+
+      .node:not(:last-child)::before {
+        position: absolute;
+        z-index: 1;
+        top: calc(50% - 4px);
+        right: -20px;
+        width: 8px;
+        height: 8px;
+        border-top: 2px solid var(--cyan);
+        border-right: 2px solid var(--cyan);
+        transform: rotate(45deg);
+        content: "";
+      }
+
+      .step {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        border: 1px solid rgba(66, 210, 232, 0.36);
+        border-radius: 9px;
+        background: rgba(66, 210, 232, 0.12);
+        color: var(--cyan);
+        font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .node h3 {
+        margin: 18px 0 4px;
+        font-size: 17px;
+      }
+
+      .node small {
+        display: block;
+        margin-top: 12px;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+        font-size: 11px;
+      }
+
+      .lower {
+        display: grid;
+        grid-template-columns: 1.45fr 0.8fr;
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .panel {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .panel h2 {
+        padding: 18px 20px 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      th {
+        padding: 8px 20px;
+        border-bottom: 1px solid var(--line);
+        color: var(--muted);
+        text-align: left;
+      }
+
+      td {
+        padding: 10px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .state {
+        display: inline-block;
+        min-width: 68px;
+      }
+
+      .pass {
+        color: var(--green);
+      }
+
+      .pending {
+        color: var(--amber);
+      }
+
+      .sequence {
+        display: grid;
+        gap: 10px;
+        padding: 4px 20px 20px;
+      }
+
+      .sequence div {
+        display: grid;
+        grid-template-columns: 28px 1fr;
+        gap: 10px;
+        align-items: start;
+        padding: 11px;
+        border-radius: 12px;
+        background: var(--panel-strong);
+        color: #cbd9e6;
+        font-size: 13px;
+      }
+
+      .sequence b {
+        color: var(--blue);
+        font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+      }
+
+      footer {
+        margin: 18px 4px 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @media (max-width: 920px) {
+        .path {
+          grid-template-columns: 1fr;
+        }
+
+        .node:not(:last-child)::before,
+        .node:not(:last-child)::after {
+          display: none;
+        }
+
+        .lower {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 620px) {
+        main {
+          width: min(100% - 24px, 1200px);
+        }
+
+        header,
+        .status {
+          grid-template-columns: 1fr;
+          display: grid;
+        }
+
+        .stamp {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <div class="eyebrow">System explainer · rich HTML</div>
+          <h1>Cross-machine release control path</h1>
+        </div>
+        <div class="stamp">
+          source.gpt.md<br>
+          synthetic example
+        </div>
+      </header>
+
+      <section class="status" aria-label="Release status">
+        <span class="status-mark"></span>
+        <div>
+          <strong>Request and status reporting are operational.</strong>
+          <p>
+            Digest verification and restart evidence remain
+            incomplete.
+          </p>
+        </div>
+        <div class="hold">Release hold</div>
+      </section>
+
+      <div class="section-head">
+        <h2>The durable path</h2>
+        <span>live output supports · records decide</span>
+      </div>
+
+      <section class="path" aria-label="Control path">
+        <article class="node">
+          <span class="step">01</span>
+          <h3>Workstation</h3>
+          <p>Writes the durable release request.</p>
+          <small>request identifier</small>
+        </article>
+        <article class="node">
+          <span class="step">02</span>
+          <h3>Relay</h3>
+          <p>Authenticates and forwards the identifier.</p>
+          <small>reachability result</small>
+        </article>
+        <article class="node">
+          <span class="step">03</span>
+          <h3>Build worker</h3>
+          <p>Builds, tests, and records progress.</p>
+          <small>job + test record</small>
+        </article>
+        <article class="node">
+          <span class="step">04</span>
+          <h3>Registry</h3>
+          <p>Stores the digest-pinned candidate.</p>
+          <small>candidate digest</small>
+        </article>
+        <article class="node">
+          <span class="step">05</span>
+          <h3>Workstation</h3>
+          <p>Reads the durable status record.</p>
+          <small>recorded release status</small>
+        </article>
+      </section>
+
+      <section class="lower">
+        <article class="panel">
+          <h2>Current evidence</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Check</th>
+                <th>State</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Request record</td>
+                <td><span class="state pass">Pass</span></td>
+                <td>Identifier and creation time recorded</td>
+              </tr>
+              <tr>
+                <td>Relay reachability</td>
+                <td><span class="state pass">Pass</span></td>
+                <td>Authenticated probe completed</td>
+              </tr>
+              <tr>
+                <td>Worker job</td>
+                <td><span class="state pass">Pass</span></td>
+                <td>Build and test result recorded</td>
+              </tr>
+              <tr>
+                <td>Candidate digest</td>
+                <td><span class="state pending">Pending</span></td>
+                <td>Registry and status digests must match</td>
+              </tr>
+              <tr>
+                <td>Service restart</td>
+                <td><span class="state pending">Pending</span></td>
+                <td>Restart result has not been recorded</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <article class="panel">
+          <h2>Release sequence</h2>
+          <div class="sequence">
+            <div>
+              <b>1</b>
+              <span>Compare the candidate and status digests.</span>
+            </div>
+            <div>
+              <b>2</b>
+              <span>Restart the service with the matching digest.</span>
+            </div>
+            <div>
+              <b>3</b>
+              <span>Record the restart result and final probe.</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <footer>
+        Synthetic HTMLify showcase · facts retained from
+        source.gpt.md
+      </footer>
+    </main>
+  </body>
+</html>

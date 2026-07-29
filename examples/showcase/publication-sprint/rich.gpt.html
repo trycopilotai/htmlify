@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Publication Sprint — Rich HTML</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #132238;
+        --muted: #617086;
+        --line: #dbe3ee;
+        --paper: #ffffff;
+        --canvas: #eef3f8;
+        --blue: #2563eb;
+        --blue-soft: #e7efff;
+        --green: #157a52;
+        --green-soft: #e5f6ee;
+        --amber: #9a5c09;
+        --amber-soft: #fff3d8;
+        --violet: #7357c7;
+        --violet-soft: #eeeafe;
+        --shadow: 0 18px 50px rgba(38, 55, 78, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at 85% 0%, #dfe9ff 0, transparent 32rem),
+          var(--canvas);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.45;
+      }
+
+      main {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 28px 0 64px;
+      }
+
+      .masthead,
+      .decision,
+      .panel {
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(202, 214, 230, 0.88);
+        box-shadow: var(--shadow);
+      }
+
+      .masthead {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 28px;
+        padding: 24px 28px;
+        border-radius: 22px 22px 0 0;
+        border-bottom: 0;
+      }
+
+      .eyebrow,
+      .stamp,
+      .phase-state,
+      th {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow {
+        color: var(--blue);
+      }
+
+      h1 {
+        margin: 5px 0 0;
+        font-size: clamp(32px, 4vw, 52px);
+        line-height: 1;
+        letter-spacing: -0.045em;
+      }
+
+      .stamp {
+        color: var(--muted);
+        text-align: right;
+      }
+
+      .decision {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 24px;
+        align-items: center;
+        padding: 22px 28px;
+        border-radius: 0 0 22px 22px;
+        border-top: 3px solid var(--blue);
+      }
+
+      .decision strong {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 20px;
+      }
+
+      .decision p,
+      .phase p,
+      .phase small,
+      .meta {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .cutoff {
+        min-width: 190px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: var(--blue-soft);
+        color: var(--blue);
+        text-align: center;
+        font-weight: 800;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 28px 2px 12px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 19px;
+        letter-spacing: -0.02em;
+      }
+
+      .meta {
+        font-size: 13px;
+      }
+
+      .phases {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      .phase {
+        position: relative;
+        min-height: 158px;
+        overflow: hidden;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: var(--paper);
+      }
+
+      .phase::before {
+        position: absolute;
+        inset: 0 0 auto;
+        height: 5px;
+        background: var(--phase-color);
+        content: "";
+      }
+
+      .phase.complete {
+        --phase-color: var(--green);
+        background: linear-gradient(150deg, var(--green-soft), #fff 56%);
+      }
+
+      .phase.current {
+        --phase-color: var(--blue);
+        background: linear-gradient(150deg, var(--blue-soft), #fff 56%);
+      }
+
+      .phase.write {
+        --phase-color: var(--violet);
+        background: linear-gradient(150deg, var(--violet-soft), #fff 56%);
+      }
+
+      .phase.polish {
+        --phase-color: var(--amber);
+        background: linear-gradient(150deg, var(--amber-soft), #fff 56%);
+      }
+
+      .phase-state {
+        color: var(--phase-color);
+      }
+
+      .phase h3 {
+        margin: 14px 0 4px;
+        font-size: 21px;
+      }
+
+      .phase small {
+        display: block;
+        margin-bottom: 14px;
+        font-weight: 700;
+      }
+
+      .lower {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .panel {
+        padding: 20px 22px;
+        border-radius: 18px;
+        box-shadow: 0 10px 28px rgba(38, 55, 78, 0.08);
+      }
+
+      table {
+        width: 100%;
+        margin-top: 12px;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      th {
+        padding: 0 10px 8px;
+        color: var(--muted);
+        text-align: left;
+      }
+
+      td {
+        padding: 9px 10px;
+        border-top: 1px solid var(--line);
+        vertical-align: top;
+      }
+
+      td:first-child {
+        color: var(--blue);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .gates {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .gate {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 10px;
+        align-items: start;
+        padding: 9px 10px;
+        border-radius: 12px;
+        background: #f7f9fc;
+        font-size: 13px;
+      }
+
+      .box {
+        display: grid;
+        width: 20px;
+        height: 20px;
+        place-items: center;
+        border: 2px solid #a9b6c7;
+        border-radius: 6px;
+        color: transparent;
+      }
+
+      footer {
+        margin: 18px 4px 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @media (max-width: 900px) {
+        .phases,
+        .lower {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 620px) {
+        main {
+          width: min(100% - 24px, 1180px);
+        }
+
+        .masthead,
+        .decision {
+          grid-template-columns: 1fr;
+          display: grid;
+        }
+
+        .stamp {
+          text-align: left;
+        }
+
+        .phases,
+        .lower {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="masthead">
+        <div>
+          <div class="eyebrow">Temporal plan · rich HTML</div>
+          <h1>Publication Sprint</h1>
+        </div>
+        <div class="stamp">
+          source.gpt.md<br>
+          synthetic example
+        </div>
+      </header>
+
+      <section class="decision" aria-label="Submission decision">
+        <div>
+          <strong>Proceed toward submission.</strong>
+          <p>
+            The outline is approved and the analysis draft is
+            underway. Readiness requires all four gates.
+          </p>
+        </div>
+        <div class="cutoff">October 18 cutoff</div>
+      </section>
+
+      <div class="section-title">
+        <h2>Four-phase backbone</h2>
+        <div class="meta">October 5-18, 2026</div>
+      </div>
+
+      <section class="phases" aria-label="Sprint phases">
+        <article class="phase complete">
+          <div class="phase-state">Complete</div>
+          <h3>Set up</h3>
+          <small>Oct 5-6</small>
+          <p>Sources organized and outline approved.</p>
+        </article>
+        <article class="phase current">
+          <div class="phase-state">Current</div>
+          <h3>Analyze</h3>
+          <small>Oct 7-11</small>
+          <p>Group the evidence into four findings.</p>
+        </article>
+        <article class="phase write">
+          <div class="phase-state">Planned</div>
+          <h3>Write</h3>
+          <small>Oct 12-15</small>
+          <p>Connect the introduction and full narrative.</p>
+        </article>
+        <article class="phase polish">
+          <div class="phase-state">Planned</div>
+          <h3>Polish</h3>
+          <small>Oct 16-18</small>
+          <p>Review, format, and submit the package.</p>
+        </article>
+      </section>
+
+      <section class="lower">
+        <article class="panel">
+          <h2>Near-term agenda</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Focus</th>
+                <th>Exit condition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Oct 9</td>
+                <td>Finish evidence grouping</td>
+                <td>Four findings have source notes</td>
+              </tr>
+              <tr>
+                <td>Oct 10</td>
+                <td>Draft findings one and two</td>
+                <td>Each finding has one example</td>
+              </tr>
+              <tr>
+                <td>Oct 11</td>
+                <td>Draft findings three and four</td>
+                <td>Analysis phase is complete</td>
+              </tr>
+              <tr>
+                <td>Oct 12</td>
+                <td>Begin full narrative</td>
+                <td>Introduction and findings are connected</td>
+              </tr>
+            </tbody>
+          </table>
+        </article>
+
+        <article class="panel">
+          <h2>Submission gates</h2>
+          <div class="gates">
+            <div class="gate" role="checkbox" aria-checked="false">
+              <span class="box" aria-hidden="true"></span>
+              <span>Every finding traces to a source note.</span>
+            </div>
+            <div class="gate" role="checkbox" aria-checked="false">
+              <span class="box" aria-hidden="true"></span>
+              <span>The abstract reports results.</span>
+            </div>
+            <div class="gate" role="checkbox" aria-checked="false">
+              <span class="box" aria-hidden="true"></span>
+              <span>The document matches the required format.</span>
+            </div>
+            <div class="gate" role="checkbox" aria-checked="false">
+              <span class="box" aria-hidden="true"></span>
+              <span>A final reader pass is incorporated.</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <footer>
+        Synthetic HTMLify showcase · facts retained from
+        source.gpt.md
+      </footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interface Typography Evolution Study — Rich HTML</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #171816;
+        --muted: #65685f;
+        --line: #d8d9d0;
+        --paper: #f8f7f1;
+        --canvas: #e9e7dc;
+        --lime: #c5f06f;
+        --orange: #ffad68;
+        --blue: #82c9ff;
+        --shadow: 0 20px 55px rgba(57, 54, 38, 0.13);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          linear-gradient(90deg, rgba(23, 24, 22, 0.035) 1px, transparent 1px),
+          linear-gradient(rgba(23, 24, 22, 0.035) 1px, transparent 1px),
+          var(--canvas);
+        background-size: 24px 24px;
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        line-height: 1.45;
+      }
+
+      main {
+        width: min(1200px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 28px 0 60px;
+      }
+
+      header {
+        display: grid;
+        grid-template-columns: 1.35fr 0.65fr;
+        gap: 16px;
+      }
+
+      .title-card,
+      .question,
+      .stage,
+      .finding,
+      .decision {
+        border: 1px solid rgba(84, 84, 72, 0.22);
+        background: rgba(248, 247, 241, 0.96);
+        box-shadow: var(--shadow);
+      }
+
+      .title-card {
+        padding: 24px 28px;
+        border-radius: 24px;
+      }
+
+      .eyebrow,
+      .stamp,
+      .stage-label,
+      .size,
+      .finding b {
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow {
+        color: #456217;
+      }
+
+      h1 {
+        margin: 8px 0 0;
+        font-size: clamp(32px, 4.5vw, 54px);
+        line-height: 0.98;
+        letter-spacing: -0.055em;
+      }
+
+      .question {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 22px;
+        border-radius: 24px;
+        background: var(--ink);
+        color: #f4f4ec;
+      }
+
+      .question p {
+        margin: 0;
+        font-size: 18px;
+        line-height: 1.35;
+      }
+
+      .stamp {
+        color: #a7aa9d;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin: 26px 2px 12px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 19px;
+        letter-spacing: -0.025em;
+      }
+
+      .sizes {
+        display: flex;
+        gap: 7px;
+      }
+
+      .size {
+        padding: 5px 9px;
+        border: 1px solid rgba(84, 84, 72, 0.24);
+        border-radius: 999px;
+        background: rgba(248, 247, 241, 0.72);
+        color: var(--muted);
+      }
+
+      .stages {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 13px;
+      }
+
+      .stage {
+        position: relative;
+        min-height: 285px;
+        overflow: hidden;
+        padding: 20px;
+        border-radius: 22px;
+      }
+
+      .stage::after {
+        position: absolute;
+        right: -35px;
+        bottom: -55px;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: var(--accent);
+        opacity: 0.38;
+        content: "";
+      }
+
+      .draft {
+        --accent: var(--orange);
+      }
+
+      .system {
+        --accent: var(--blue);
+      }
+
+      .final {
+        --accent: var(--lime);
+      }
+
+      .stage-label {
+        display: inline-flex;
+        padding: 6px 9px;
+        border-radius: 8px;
+        background: var(--accent);
+      }
+
+      .stage h3 {
+        margin: 16px 0 3px;
+        font-size: 21px;
+      }
+
+      .stage > p {
+        min-height: 42px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .specimen {
+        position: relative;
+        z-index: 1;
+        margin: 22px 0 15px;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+        font-size: clamp(30px, 4vw, 48px);
+        line-height: 1;
+        letter-spacing: -0.08em;
+        white-space: nowrap;
+      }
+
+      .draft .specimen {
+        font-weight: 900;
+        transform: scaleX(0.92);
+        transform-origin: left;
+      }
+
+      .system .specimen {
+        font-weight: 620;
+        letter-spacing: -0.045em;
+      }
+
+      .final .specimen {
+        font-weight: 480;
+        letter-spacing: 0.01em;
+      }
+
+      .micro {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+      }
+
+      .micro span {
+        display: grid;
+        min-height: 48px;
+        place-items: center;
+        border: 1px solid rgba(84, 84, 72, 0.18);
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.52);
+      }
+
+      .micro span:nth-child(1) {
+        font-size: 12px;
+      }
+
+      .micro span:nth-child(2) {
+        font-size: 16px;
+      }
+
+      .micro span:nth-child(3) {
+        font-size: 32px;
+      }
+
+      .lower {
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 13px;
+        margin-top: 13px;
+      }
+
+      .findings {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      .finding {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 10px;
+        align-items: start;
+        padding: 13px;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(57, 54, 38, 0.08);
+        font-size: 13px;
+      }
+
+      .finding b {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border-radius: 9px;
+        background: var(--ink);
+        color: var(--paper);
+      }
+
+      .decision {
+        padding: 18px 20px;
+        border-radius: 18px;
+        background: var(--lime);
+        box-shadow: 0 12px 30px rgba(91, 117, 36, 0.18);
+      }
+
+      .decision h2 {
+        margin-bottom: 8px;
+      }
+
+      .decision p {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      footer {
+        margin: 18px 4px 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      @media (max-width: 900px) {
+        header,
+        .lower {
+          grid-template-columns: 1fr;
+        }
+
+        .stages {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 620px) {
+        main {
+          width: min(100% - 24px, 1200px);
+        }
+
+        .findings {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <section class="title-card">
+          <div class="eyebrow">Visual progression · rich HTML</div>
+          <h1>Interface Typography Evolution Study</h1>
+        </section>
+        <aside class="question">
+          <p>
+            Can technical character survive while small-size
+            reading improves?
+          </p>
+          <div class="stamp">
+            source.gpt.md · synthetic example
+          </div>
+        </aside>
+      </header>
+
+      <div class="section-head">
+        <h2>Three retained checkpoints</h2>
+        <div class="sizes" aria-label="Reviewed specimen sizes">
+          <span class="size">12 px</span>
+          <span class="size">16 px</span>
+          <span class="size">32 px</span>
+        </div>
+      </div>
+
+      <section class="stages" aria-label="Design checkpoints">
+        <article class="stage draft">
+          <span class="stage-label">01 · Draft</span>
+          <h3>One width. Heavy default.</h3>
+          <p>Strong texture, but dense at 12 pixels.</p>
+          <div class="specimen">0O 1Il Aa</div>
+          <div class="micro">
+            <span>0O1Il</span>
+            <span>0O1Il</span>
+            <span>0O1Il</span>
+          </div>
+        </article>
+
+        <article class="stage system">
+          <span class="stage-label">02 · System</span>
+          <h3>Width and weight tokens.</h3>
+          <p>Better hierarchy; optical centers unresolved.</p>
+          <div class="specimen">0O 1Il Aa</div>
+          <div class="micro">
+            <span>0O1Il</span>
+            <span>0O1Il</span>
+            <span>0O1Il</span>
+          </div>
+        </article>
+
+        <article class="stage final">
+          <span class="stage-label">03 · Final</span>
+          <h3>Centers and grid corrected.</h3>
+          <p>Distinctions remain visible at reviewed sizes.</p>
+          <div class="specimen">0O 1Il Aa</div>
+          <div class="micro">
+            <span>0O1Il</span>
+            <span>0O1Il</span>
+            <span>0O1Il</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="lower">
+        <div class="findings" aria-label="Study findings">
+          <div class="finding">
+            <b>01</b>
+            <span>Lower default weight opens counters at 12 pixels.</span>
+          </div>
+          <div class="finding">
+            <b>02</b>
+            <span>Width tokens separate labels and data strings.</span>
+          </div>
+          <div class="finding">
+            <b>03</b>
+            <span>Optical centers stabilize rounded glyphs.</span>
+          </div>
+          <div class="finding">
+            <b>04</b>
+            <span>Integer-grid alignment improves retained specimens.</span>
+          </div>
+        </div>
+
+        <aside class="decision">
+          <h2>Decision</h2>
+          <p>
+            Use the final checkpoint for interface labels and
+            data strings. Retain earlier stages as evidence.
+          </p>
+        </aside>
+      </section>
+
+      <footer>
+        Synthetic HTMLify showcase · facts retained from
+        source.gpt.md
+      </footer>
+    </main>
+  </body>
+</html>
