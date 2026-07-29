@@ -94,12 +94,13 @@ visual progression across three retained design checkpoints.
 
 ## Use it
 
-Install the current package from `main` as a Claude Code
-skill:
+### Claude Code
+
+Install the tagged skill package:
 
 ```sh
 install_tmp="$(mktemp -d)" \
-  && git clone --quiet --depth 1 --branch main \
+  && git clone --quiet --depth 1 --branch v0.1.0 \
        https://github.com/trycopilotai/htmlify \
        "$install_tmp/htmlify" \
   && mkdir -p ~/.claude/skills/htmlify \
@@ -115,11 +116,36 @@ Or install it from the trycopilot.ai marketplace:
 /plugin install htmlify@trycopilotai
 ```
 
-Invoke `htmlify` by name or ask the agent to visualize,
-compare, dashboard, timeline, inspect, render, print, or
-export Markdown. Ask for formal output when source order is
-the priority, or rich output when relationships and
-decisions should become a visual surface.
+Invoke it as `/htmlify`.
+
+### Codex
+
+Install the same tagged skill package:
+
+```sh
+install_tmp="$(mktemp -d)" \
+  && git clone --quiet --depth 1 --branch v0.1.0 \
+       https://github.com/trycopilotai/htmlify \
+       "$install_tmp/htmlify" \
+  && mkdir -p ~/.codex/skills/htmlify \
+  && cp -R "$install_tmp/htmlify/skill/." \
+       ~/.codex/skills/htmlify/ \
+  && rm -rf "$install_tmp"
+```
+
+Invoke it as `$htmlify`.
+
+The source checkout on `main` also carries Claude Code and
+Codex plugin manifests at development version
+`0.2.0-dev.0`. They discover the same canonical
+`skill/SKILL.md`; those manifests are not part of the
+`v0.1.0` tag.
+
+For either agent, ask it to visualize, compare, dashboard,
+timeline, inspect, render, print, or export Markdown. Ask
+for formal output when source order is the priority, or rich
+output when relationships and decisions should become a
+visual surface.
 
 Read [`skill/SKILL.md`](skill/SKILL.md) before installing.
 The skill writes files and may open a browser, start a local

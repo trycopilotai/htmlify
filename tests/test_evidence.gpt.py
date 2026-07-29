@@ -337,6 +337,7 @@ class EvidenceTest(unittest.TestCase):
                     "from pathlib import Path; "
                     "root = Path('skill'); "
                     "expected = {'SKILL.md', "
+                    "'agents/openai.yaml', "
                     "'scripts/formal_md_to_html.py', "
                     "'scripts/formal_html_to_pdf.py', "
                     "'scripts/formal_render.py'}; "
