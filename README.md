@@ -116,7 +116,8 @@ Or install it from the trycopilot.ai marketplace:
 /plugin install htmlify@trycopilotai
 ```
 
-Invoke it as `/htmlify`.
+Invoke the directly installed skill as `/htmlify`. Invoke the
+marketplace plugin as `/htmlify:htmlify`.
 
 ### Codex
 
@@ -127,9 +128,9 @@ install_tmp="$(mktemp -d)" \
   && git clone --quiet --depth 1 --branch v0.1.0 \
        https://github.com/trycopilotai/htmlify \
        "$install_tmp/htmlify" \
-  && mkdir -p ~/.codex/skills/htmlify \
+  && mkdir -p ~/.agents/skills/htmlify \
   && cp -R "$install_tmp/htmlify/skill/." \
-       ~/.codex/skills/htmlify/ \
+       ~/.agents/skills/htmlify/ \
   && rm -rf "$install_tmp"
 ```
 
