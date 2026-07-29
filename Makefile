@@ -4,7 +4,9 @@ compile:
 	@python3 -m compileall -q skill/scripts tests
 
 test:
-	@python3 -m unittest discover -s tests -p 'test*.gpt.py' -v
+	@set -e; for test_file in tests/test*.gpt.py; do \
+	  python3 "$$test_file"; \
+	done
 
 check: compile test
 
