@@ -20,7 +20,16 @@ issue, fixture, commit message, or example.
 
 ## Development
 
-The offline suite needs Python 3.11 or later:
+The Python suites need Python 3.11 or later:
+
+```sh
+make compile test
+```
+
+The complete offline check also needs Chrome or Chromium and
+ImageMagick. It rebuilds the screenshots and animations in
+an isolated directory, then verifies their dimensions and
+timing:
 
 ```sh
 make check
@@ -30,9 +39,9 @@ Add a focused test for every behavior change. A renderer
 change also needs a golden output change when it affects
 reader-visible HTML.
 
-Tests must not fetch network resources. PDF backend
-integration is a release check and must state the backend it
-exercised.
+Tests must not fetch network resources. The formal PDF
+backends are separate and optional; PDF integration is a
+release check and must state the backend it exercised.
 
 ## Pull requests
 

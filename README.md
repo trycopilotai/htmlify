@@ -94,19 +94,41 @@ visual progression across three retained design checkpoints.
 
 ## Use it
 
+| Agent       | Direct invocation | Marketplace invocation |
+| ----------- | ----------------- | ---------------------- |
+| Claude Code | `/htmlify`        | `/htmlify:htmlify`     |
+| Codex       | `$htmlify`        | `$htmlify`             |
+
 ### Claude Code
 
 Install the tagged skill package:
 
 ```sh
-install_tmp="$(mktemp -d)" \
-  && git clone --quiet --depth 1 --branch v0.1.0 \
-       https://github.com/trycopilotai/htmlify \
-       "$install_tmp/htmlify" \
-  && mkdir -p ~/.claude/skills/htmlify \
-  && cp -R "$install_tmp/htmlify/skill/." \
-       ~/.claude/skills/htmlify/ \
-  && rm -rf "$install_tmp"
+set -eu
+install_parent="$HOME/.claude/skills"
+install_target="$install_parent/htmlify"
+mkdir -p "$install_parent"
+install_tmp="$(mktemp -d "$install_parent/.htmlify.XXXXXX")"
+install_stage="$install_tmp/package"
+rollback_install() {
+  if [ ! -e "$install_target" ]; then
+    if [ -e "$install_tmp/previous" ]; then
+      mv "$install_tmp/previous" "$install_target"
+    fi
+  fi
+}
+trap rollback_install EXIT
+git clone --quiet --depth 1 --branch v0.2.0 \
+  https://github.com/trycopilotai/htmlify \
+  "$install_tmp/htmlify"
+mkdir -p "$install_stage"
+cp -R "$install_tmp/htmlify/skill/." "$install_stage/"
+if [ -e "$install_target" ]; then
+  mv "$install_target" "$install_tmp/previous"
+fi
+mv "$install_stage" "$install_target"
+trap - EXIT
+rm -rf "$install_tmp"
 ```
 
 Or install it from the trycopilot.ai marketplace:
@@ -121,27 +143,51 @@ marketplace plugin as `/htmlify:htmlify`.
 
 ### Codex
 
-Install the same tagged skill package:
+Install the same tagged skill package directly:
 
 ```sh
-install_tmp="$(mktemp -d)" \
-  && git clone --quiet --depth 1 --branch v0.1.0 \
-       https://github.com/trycopilotai/htmlify \
-       "$install_tmp/htmlify" \
-  && mkdir -p ~/.agents/skills/htmlify \
-  && cp -R "$install_tmp/htmlify/skill/." \
-       ~/.agents/skills/htmlify/ \
-  && rm -rf "$install_tmp"
+set -eu
+install_parent="$HOME/.agents/skills"
+install_target="$install_parent/htmlify"
+mkdir -p "$install_parent"
+install_tmp="$(mktemp -d "$install_parent/.htmlify.XXXXXX")"
+install_stage="$install_tmp/package"
+rollback_install() {
+  if [ ! -e "$install_target" ]; then
+    if [ -e "$install_tmp/previous" ]; then
+      mv "$install_tmp/previous" "$install_target"
+    fi
+  fi
+}
+trap rollback_install EXIT
+git clone --quiet --depth 1 --branch v0.2.0 \
+  https://github.com/trycopilotai/htmlify \
+  "$install_tmp/htmlify"
+mkdir -p "$install_stage"
+cp -R "$install_tmp/htmlify/skill/." "$install_stage/"
+if [ -e "$install_target" ]; then
+  mv "$install_target" "$install_tmp/previous"
+fi
+mv "$install_stage" "$install_target"
+trap - EXIT
+rm -rf "$install_tmp"
 ```
 
-Invoke it as `$htmlify`.
+Or install it from the trycopilot.ai marketplace:
 
-The source checkout on `main` also carries Claude Code and
-Codex plugin manifests at development version
-`0.2.0-dev.0`. `skill/SKILL.md` resolves to the package both
-runtimes load under `skills/htmlify`, so the skill content
-is stored once. Those manifests are not part of the `v0.1.0`
-tag.
+```sh
+npx -y @openai/codex plugin marketplace add \
+  trycopilotai/skills --ref main
+npx -y @openai/codex plugin add \
+  htmlify@trycopilotai
+```
+
+Invoke either Codex installation as `$htmlify`.
+
+The `v0.2.0` package carries Claude Code and Codex plugin
+manifests. `skill/SKILL.md` resolves to the package both
+runtimes load under `skills/htmlify`, so the skill content is
+stored once.
 
 For either agent, ask it to visualize, compare, dashboard,
 timeline, inspect, render, print, or export Markdown. Ask
@@ -176,13 +222,13 @@ full CommonMark or GFM compatibility.
 
 ## What is different
 
-Figures were fetched from GitHub on 2026-07-28.
+Figures were fetched from GitHub on 2026-07-29.
 
 | Project                                                               |         GitHub figures | Primary surface                                               | Formal print runtime                          |
 | --------------------------------------------------------------------- | ---------------------: | ------------------------------------------------------------- | --------------------------------------------- |
 | `htmlify`                                                             |                    New | Source-checked Markdown decision surfaces                     | Bundled HTML renderer and optional PDF export |
-| [`visual-explainer`](https://github.com/nicobailon/visual-explainer)  | 9,350 stars, 630 forks | Broad diagrams, plan reviews, data tables, recaps, and slides | Not its stated primary surface                |
-| [`markdown-viewer/skills`](https://github.com/markdown-viewer/skills) | 3,102 stars, 177 forks | Diagram and visualization engines embedded in Markdown        | Not its stated primary surface                |
+| [`visual-explainer`](https://github.com/nicobailon/visual-explainer)  | 9,356 stars, 630 forks | Broad diagrams, plan reviews, data tables, recaps, and slides | Not its stated primary surface                |
+| [`markdown-viewer/skills`](https://github.com/markdown-viewer/skills) | 3,104 stars, 178 forks | Diagram and visualization engines embedded in Markdown        | Not its stated primary surface                |
 
 Rich self-contained HTML is established table stakes.
 `htmlify` is narrower: it makes the interpretation-versus-
@@ -198,8 +244,14 @@ the hashes and fail when prose, generated assets, or
 manifests drift.
 
 The three synthetic showcases commit their source, formal
-HTML, and rich HTML together. `make assets` rebuilds each
-three-frame animation in that order.
+HTML, rich HTML, final run record, and manifest
+together. `make assets` rebuilds each three-frame animation
+in that order. `make check` regenerates the assets in an
+isolated directory and verifies their dimensions and timing.
+The machine-readable contrast audit records the text and
+color pairs checked during release QA. Tests recompute every
+declared ratio, fail below 4.5:1, and confirm the recorded
+color tokens remain in the relevant source document.
 
 See [the evidence summary](examples/README.md).
 

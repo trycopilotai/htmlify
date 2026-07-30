@@ -8,10 +8,11 @@ bundled formal renderer.
 - [Rendered PDF](delivery-brief.pdf)
 - [Evidence manifest](manifest.gpt.json)
 
-The live run selected Chrome and produced a non-empty,
-single-page US Letter PDF. The page was rasterized with
-Poppler and visually inspected for clipping, overlap,
-spacing, table alignment, and unreadable glyphs.
+The live run selected Google Chrome 150.0.7871.187 and
+produced a non-empty, single-page US Letter PDF. The page
+was rasterized with Poppler at 1275 by 1650 pixels and
+visually inspected for clipping, overlap, spacing, table
+alignment, and unreadable glyphs.
 
 The run did not exercise WeasyPrint, Chromium, Microsoft
 Edge, or wkhtmltopdf. The PDF bytes include backend metadata

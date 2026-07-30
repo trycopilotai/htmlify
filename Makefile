@@ -11,6 +11,9 @@ test:
 assets:
 	@python3 assets/build.gpt.py
 
-check: compile test
+assets-check:
+	@python3 assets/build.gpt.py --check
 
-.PHONY: compile test assets check
+check: compile test assets-check
+
+.PHONY: compile test assets assets-check check
