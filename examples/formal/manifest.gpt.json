@@ -5,13 +5,26 @@
   "agent": "Python",
   "agent_version": "Python 3.14.6",
   "invocation": "python3 skill/scripts/formal_render.py examples/formal/delivery-brief.gpt.md --html examples/formal/delivery-brief.html --pdf examples/formal/delivery-brief.pdf",
-  "date": "2026-07-28",
-  "edited": false,
+  "date": "2026-07-29",
+  "output_edited": false,
   "pdf_backend": "chrome",
+  "pdf_backend_version": "Google Chrome 150.0.7871.187",
   "pdf_pages": 1,
+  "pdf_page_size": "612 x 792 pts (US Letter)",
+  "visual_qa": {
+    "method": "Poppler raster at 1275x1650",
+    "checks": [
+      "clipping",
+      "overlap",
+      "spacing",
+      "table alignment",
+      "glyph readability"
+    ],
+    "result": "passed"
+  },
   "files": {
     "examples/formal/delivery-brief.gpt.md": "e0df178f7a7e167d936b2bc21a1d1267f7d5488036d7eed43d93cae7e2a0f221",
     "examples/formal/delivery-brief.html": "397834cef69b80afe9987dd16e54b18d6d0aa8f4c8eec71d5cbe8ac4b699cea2",
-    "examples/formal/delivery-brief.pdf": "a8269357e87cf25ce5723f292cecad98e06e274092212cfc6a1d65c929d63762"
+    "examples/formal/delivery-brief.pdf": "930fd117f5572da383c1773d87548c7f32f8b8956f217a96b000c4e0a8bb80ad"
   }
 }

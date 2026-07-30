@@ -1,0 +1,301 @@
+{
+  "minimum_ratio": 4.5,
+  "documents": {
+    "assets/build.gpt.py": [
+      {
+        "label": "source title",
+        "foreground": "#ffffff",
+        "background": "#20242d"
+      },
+      {
+        "label": "source filename",
+        "foreground": "#a9b5c8",
+        "background": "#20242d"
+      },
+      {
+        "label": "source state",
+        "foreground": "#dce5ff",
+        "background": "#263252"
+      },
+      {
+        "label": "source list marker",
+        "foreground": "#78859a",
+        "background": "#171a21"
+      },
+      {
+        "label": "source code",
+        "foreground": "#e4e9f2",
+        "background": "#171a21"
+      }
+    ],
+    "assets/social-preview.gpt.html": [
+      {
+        "label": "primary text",
+        "foreground": "#f8fafc",
+        "background": "#101a34"
+      },
+      {
+        "label": "brand mark",
+        "foreground": "#a998ff",
+        "background": "#101a34"
+      },
+      {
+        "label": "tagline",
+        "foreground": "#cbd5e1",
+        "background": "#101a34"
+      },
+      {
+        "label": "card heading",
+        "foreground": "#f8fafc",
+        "background": "#232c44",
+        "tokens": [
+          "#f8fafc",
+          "rgba(255, 255, 255, 0.08)",
+          "#101a34"
+        ]
+      },
+      {
+        "label": "card label",
+        "foreground": "#a998ff",
+        "background": "#232c44",
+        "tokens": [
+          "#a998ff",
+          "rgba(255, 255, 255, 0.08)",
+          "#101a34"
+        ]
+      },
+      {
+        "label": "card body",
+        "foreground": "#cbd5e1",
+        "background": "#232c44",
+        "tokens": [
+          "#cbd5e1",
+          "rgba(255, 255, 255, 0.08)",
+          "#101a34"
+        ]
+      }
+    ],
+    "examples/curated/index.html": [
+      {
+        "label": "body text",
+        "foreground": "#17231f",
+        "background": "#f2f0e8"
+      },
+      {
+        "label": "muted text",
+        "foreground": "#58635e",
+        "background": "#f2f0e8"
+      },
+      {
+        "label": "decision text",
+        "foreground": "#ffffff",
+        "background": "#102b24"
+      },
+      {
+        "label": "decision summary",
+        "foreground": "#edf4f1",
+        "background": "#102b24"
+      },
+      {
+        "label": "decision label",
+        "foreground": "#cbd8d2",
+        "background": "#102b24"
+      },
+      {
+        "label": "hold marker",
+        "foreground": "#332207",
+        "background": "#f4b85a"
+      },
+      {
+        "label": "ready status",
+        "foreground": "#17633d",
+        "background": "#e6f4eb"
+      },
+      {
+        "label": "pending status",
+        "foreground": "#8e2f12",
+        "background": "#ffebe3"
+      },
+      {
+        "label": "question text",
+        "foreground": "#51380c",
+        "background": "#fff3d9"
+      },
+      {
+        "label": "outside state",
+        "foreground": "#4f5b56",
+        "background": "#fffdf8"
+      }
+    ],
+    "examples/showcase/publication-sprint/rich.gpt.html": [
+      {
+        "label": "body text",
+        "foreground": "#18212b",
+        "background": "#f4f1e9"
+      },
+      {
+        "label": "muted text",
+        "foreground": "#52606d",
+        "background": "#f4f1e9"
+      },
+      {
+        "label": "surface text",
+        "foreground": "#18212b",
+        "background": "#fffdf8"
+      },
+      {
+        "label": "interpretation text",
+        "foreground": "#f8fafc",
+        "background": "#18212b"
+      },
+      {
+        "label": "interpretation label",
+        "foreground": "#89e2df",
+        "background": "#18212b"
+      },
+      {
+        "label": "synthetic badge",
+        "foreground": "#70301b",
+        "background": "#fbe9df"
+      },
+      {
+        "label": "complete state",
+        "foreground": "#0b6248",
+        "background": "#dff4e9"
+      },
+      {
+        "label": "current state",
+        "foreground": "#745300",
+        "background": "#fff0b3"
+      },
+      {
+        "label": "planned state",
+        "foreground": "#31577d",
+        "background": "#e3eef9"
+      },
+      {
+        "label": "agenda date",
+        "foreground": "#ffffff",
+        "background": "#006c72",
+        "tokens": [
+          "#fff",
+          "#006c72"
+        ]
+      },
+      {
+        "label": "relationship body",
+        "foreground": "#243d42",
+        "background": "#dff4f2"
+      },
+      {
+        "label": "relationship heading",
+        "foreground": "#005f65",
+        "background": "#dff4f2"
+      },
+      {
+        "label": "gate rule",
+        "foreground": "#4e3900",
+        "background": "#fff0b3"
+      },
+      {
+        "label": "gate state",
+        "foreground": "#6a3d00",
+        "background": "#faf8f2"
+      },
+      {
+        "label": "risk heading",
+        "foreground": "#622712",
+        "background": "#fbe9df"
+      }
+    ],
+    "examples/showcase/control-plane-status/rich.gpt.html": [
+      {
+        "label": "primary text",
+        "foreground": "#f5f7fb",
+        "background": "#090d14"
+      },
+      {
+        "label": "muted text",
+        "foreground": "#b9c2d0",
+        "background": "#111824"
+      },
+      {
+        "label": "dim text",
+        "foreground": "#8793a5",
+        "background": "#111824"
+      },
+      {
+        "label": "cyan label",
+        "foreground": "#62d4e9",
+        "background": "#111824"
+      },
+      {
+        "label": "pass state",
+        "foreground": "#83e6ac",
+        "background": "#0e1520"
+      },
+      {
+        "label": "hold state",
+        "foreground": "#ffd166",
+        "background": "#4a3512"
+      },
+      {
+        "label": "hold copy",
+        "foreground": "#f2dfac",
+        "background": "#4a3512"
+      }
+    ],
+    "examples/showcase/design-evolution/rich.gpt.html": [
+      {
+        "label": "body text",
+        "foreground": "#17221f",
+        "background": "#f5f3ed"
+      },
+      {
+        "label": "muted text",
+        "foreground": "#4c5a56",
+        "background": "#f5f3ed"
+      },
+      {
+        "label": "surface muted text",
+        "foreground": "#4c5a56",
+        "background": "#fffef9"
+      },
+      {
+        "label": "selected decision",
+        "foreground": "#ffffff",
+        "background": "#0c6656"
+      },
+      {
+        "label": "draft checkpoint",
+        "foreground": "#5c477c",
+        "background": "#eee8f6"
+      },
+      {
+        "label": "system checkpoint",
+        "foreground": "#96510a",
+        "background": "#fff0d9"
+      },
+      {
+        "label": "final checkpoint",
+        "foreground": "#0c6656",
+        "background": "#dcefe9"
+      },
+      {
+        "label": "checkpoint uncertainty",
+        "foreground": "#744004",
+        "background": "#fff0d9"
+      },
+      {
+        "label": "compliance limitation",
+        "foreground": "#653703",
+        "background": "#fff0d9"
+      },
+      {
+        "label": "focus text",
+        "foreground": "#073f78",
+        "background": "#ffffff"
+      }
+    ]
+  }
+}

@@ -1,424 +1,1061 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Publication Sprint — Rich HTML</title>
-    <style>
-      :root {
-        color-scheme: light;
-        --ink: #132238;
-        --muted: #617086;
-        --line: #dbe3ee;
-        --paper: #ffffff;
-        --canvas: #eef3f8;
-        --blue: #2563eb;
-        --blue-soft: #e7efff;
-        --green: #157a52;
-        --green-soft: #e5f6ee;
-        --amber: #9a5c09;
-        --amber-soft: #fff3d8;
-        --violet: #7357c7;
-        --violet-soft: #eeeafe;
-        --shadow: 0 18px 50px rgba(38, 55, 78, 0.12);
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Publication Sprint — Curated Timeline</title>
+  <style>
+    :root {
+      --paper: #f4f1e9;
+      --paper-deep: #ebe6dc;
+      --surface: #fffdf8;
+      --ink: #18212b;
+      --muted: #52606d;
+      --line: #c9c3b8;
+      --line-strong: #88847d;
+      --complete: #0b6248;
+      --complete-soft: #dff4e9;
+      --current: #745300;
+      --current-soft: #fff0b3;
+      --planned: #31577d;
+      --planned-soft: #e3eef9;
+      --risk: #873c22;
+      --risk-soft: #fbe9df;
+      --focus: #006c72;
+      --focus-soft: #dff4f2;
+      --shadow: 0 14px 40px rgba(24, 33, 43, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 280px;
+      background:
+        linear-gradient(rgba(24, 33, 43, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(24, 33, 43, 0.035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+      color: var(--ink);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      padding: 10px 14px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: var(--surface);
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .page {
+      width: min(100% - 40px, 1240px);
+      margin: 0 auto;
+      padding: 32px 0 44px;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow,
+    .section-kicker,
+    .micro-label {
+      margin: 0;
+      color: var(--focus);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin-bottom: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.5rem, 7vw, 5.4rem);
+      font-weight: 500;
+      letter-spacing: -0.055em;
+      line-height: 0.9;
+    }
+
+    .source-badge {
+      flex: 0 0 auto;
+      max-width: 260px;
+      margin: 0;
+      padding: 9px 13px;
+      border: 1px solid #b96a48;
+      border-radius: 999px;
+      background: var(--risk-soft);
+      color: #70301b;
+      font-size: 0.78rem;
+      font-weight: 750;
+      line-height: 1.25;
+      text-align: center;
+    }
+
+    .decision-surface {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(270px, 0.85fr);
+      gap: 14px;
+      margin-bottom: 34px;
+    }
+
+    .interpretation,
+    .source-summary {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .interpretation {
+      position: relative;
+      overflow: hidden;
+      padding: 22px 24px 23px 29px;
+      background: var(--ink);
+      color: #f8fafc;
+    }
+
+    .interpretation::before {
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 7px;
+      background: #5cd1cd;
+      content: "";
+    }
+
+    .interpretation .micro-label {
+      color: #89e2df;
+    }
+
+    .interpretation p:last-child {
+      max-width: 780px;
+      margin: 8px 0 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.25rem, 2.3vw, 1.7rem);
+      line-height: 1.28;
+    }
+
+    .source-summary {
+      margin: 0;
+      padding: 19px 21px;
+      background: var(--surface);
+    }
+
+    .source-summary > div {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .source-summary > div:first-child {
+      padding-top: 0;
+    }
+
+    .source-summary > div:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .source-summary dt {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .source-summary dd {
+      margin: 0;
+      font-weight: 720;
+    }
+
+    main {
+      display: grid;
+      gap: 34px;
+    }
+
+    section {
+      scroll-margin-top: 24px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 14px;
+    }
+
+    .section-heading h2 {
+      margin: 2px 0 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.75rem, 3.5vw, 2.55rem);
+      font-weight: 500;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+    }
+
+    .section-note {
+      max-width: 500px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: right;
+    }
+
+    .phase-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: phase;
+    }
+
+    .phase {
+      position: relative;
+      min-width: 0;
+      counter-increment: phase;
+    }
+
+    .phase:not(:last-child)::after {
+      position: absolute;
+      top: 29px;
+      left: calc(100% - 14px);
+      z-index: 2;
+      width: 28px;
+      height: 2px;
+      background: var(--line-strong);
+      content: "";
+    }
+
+    .phase-card {
+      height: 100%;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 8px 22px rgba(24, 33, 43, 0.05);
+    }
+
+    .phase.current .phase-card {
+      border: 2px solid #a87900;
+      box-shadow: 0 10px 26px rgba(116, 83, 0, 0.13);
+    }
+
+    .phase-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 58px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .phase.complete .phase-top {
+      background: var(--complete-soft);
+    }
+
+    .phase.current .phase-top {
+      background: var(--current-soft);
+    }
+
+    .phase.planned .phase-top {
+      background: var(--planned-soft);
+    }
+
+    .phase-index {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      place-items: center;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      color: var(--ink);
+      font-size: 0.74rem;
+      font-weight: 850;
+    }
+
+    .phase-index::before {
+      content: counter(phase, decimal-leading-zero);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.72rem;
+      font-weight: 850;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .status::before {
+      width: 8px;
+      height: 8px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      background: transparent;
+      content: "";
+    }
+
+    .status.complete {
+      color: var(--complete);
+    }
+
+    .status.complete::before {
+      background: currentColor;
+    }
+
+    .status.current {
+      color: var(--current);
+    }
+
+    .status.current::before {
+      border-radius: 2px;
+      background: currentColor;
+      transform: rotate(45deg);
+    }
+
+    .status.planned {
+      color: var(--planned);
+    }
+
+    .phase-body {
+      padding: 17px 16px 19px;
+    }
+
+    .phase-body h3 {
+      margin-bottom: 5px;
+      font-size: 1.15rem;
+      letter-spacing: -0.015em;
+    }
+
+    .phase-dates {
+      margin-bottom: 17px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 720;
+    }
+
+    .phase-outcome {
+      margin: 0;
+      color: #35414d;
+      font-size: 0.94rem;
+    }
+
+    .relationship-panel {
+      display: grid;
+      grid-template-columns: 205px 1fr;
+      gap: 18px;
+      margin-top: 14px;
+      padding: 18px 20px;
+      border: 1px solid #91c6c4;
+      border-radius: 15px;
+      background: var(--focus-soft);
+    }
+
+    .relationship-panel h3 {
+      margin: 0;
+      color: #005f65;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .relationship-panel p {
+      margin: 0;
+      color: #243d42;
+    }
+
+    .relationship-panel strong {
+      color: #004f54;
+    }
+
+    .agenda-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .agenda-item {
+      min-width: 0;
+      padding: 0 15px 17px;
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--focus);
+      border-radius: 13px;
+      background: var(--surface);
+    }
+
+    .agenda-date {
+      display: inline-block;
+      margin: -5px 0 14px -15px;
+      padding: 8px 13px;
+      border-radius: 8px 0 10px 0;
+      background: var(--focus);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 850;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .agenda-item h3 {
+      min-height: 2.7em;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      line-height: 1.32;
+    }
+
+    .exit-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .agenda-item p {
+      margin: 0;
+      color: #35414d;
+      font-size: 0.9rem;
+    }
+
+    .cutoff-note {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 7px;
+      border: 1px solid #ae6b4b;
+      border-radius: 5px;
+      background: var(--risk-soft);
+      color: #70301b;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .readiness-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+      gap: 14px;
+    }
+
+    .gate-panel,
+    .risk-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .gate-panel {
+      padding: 21px;
+    }
+
+    .gate-rule {
+      margin-bottom: 18px;
+      padding: 12px 14px;
+      border-left: 5px solid var(--current);
+      border-radius: 6px;
+      background: var(--current-soft);
+      color: #4e3900;
+      font-weight: 750;
+    }
+
+    .gate-list {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .gate-list li {
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #faf8f2;
+    }
+
+    .empty-check {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #59636d;
+      border-radius: 4px;
+      background: #fff;
+    }
+
+    .gate-state {
+      color: #6a3d00;
+      font-size: 0.7rem;
+      font-weight: 850;
+      letter-spacing: 0.06em;
+      text-align: right;
+      text-transform: uppercase;
+    }
+
+    .risk-panel {
+      overflow: hidden;
+    }
+
+    .risk-panel header {
+      padding: 20px 20px 15px;
+      border-bottom: 1px solid #d7a88f;
+      background: var(--risk-soft);
+    }
+
+    .risk-panel h3 {
+      margin: 3px 0 0;
+      color: #622712;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.65rem;
+      font-weight: 500;
+    }
+
+    .risk-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .risk-list li {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .risk-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .risk-list p {
+      margin-bottom: 7px;
+    }
+
+    .risk-list p:last-child {
+      margin-bottom: 0;
+    }
+
+    .protection {
+      color: #70301b;
+      font-size: 0.86rem;
+      font-weight: 780;
+    }
+
+    .dependency-map {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .dependency-map li {
+      display: grid;
+      grid-template-columns: minmax(170px, 0.85fr) 34px minmax(0, 1.5fr);
+      gap: 9px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+    }
+
+    .dependency-from {
+      color: #35414d;
+      font-weight: 720;
+    }
+
+    .dependency-arrow {
+      color: var(--focus);
+      font-size: 1.25rem;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .dependency-to {
+      color: var(--ink);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      margin-top: 36px;
+      padding-top: 17px;
+      border-top: 1px solid var(--line-strong);
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    footer p {
+      max-width: 680px;
+      margin: 0;
+    }
+
+    footer p:last-child {
+      text-align: right;
+    }
+
+    @media (max-width: 900px) {
+      .decision-surface,
+      .readiness-grid {
+        grid-template-columns: 1fr;
       }
 
-      * {
-        box-sizing: border-box;
+      .phase-list,
+      .agenda-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      body {
-        margin: 0;
-        background:
-          radial-gradient(circle at 85% 0%, #dfe9ff 0, transparent 32rem),
-          var(--canvas);
-        color: var(--ink);
-        font-family:
-          Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
-          "Segoe UI", sans-serif;
-        line-height: 1.45;
+      .phase:not(:last-child)::after {
+        display: none;
       }
 
-      main {
-        width: min(1180px, calc(100% - 40px));
-        margin: 0 auto;
-        padding: 28px 0 64px;
+      .agenda-item h3 {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100% - 24px, 1240px);
+        padding-top: 22px;
       }
 
       .masthead,
-      .decision,
-      .panel {
-        background: rgba(255, 255, 255, 0.94);
-        border: 1px solid rgba(202, 214, 230, 0.88);
-        box-shadow: var(--shadow);
-      }
-
-      .masthead {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 28px;
-        padding: 24px 28px;
-        border-radius: 22px 22px 0 0;
-        border-bottom: 0;
-      }
-
-      .eyebrow,
-      .stamp,
-      .phase-state,
-      th {
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.09em;
-        text-transform: uppercase;
-      }
-
-      .eyebrow {
-        color: var(--blue);
+      .section-heading,
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
       }
 
       h1 {
-        margin: 5px 0 0;
-        font-size: clamp(32px, 4vw, 52px);
-        line-height: 1;
-        letter-spacing: -0.045em;
+        font-size: clamp(2.7rem, 17vw, 4.3rem);
       }
 
-      .stamp {
-        color: var(--muted);
-        text-align: right;
-      }
-
-      .decision {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 24px;
-        align-items: center;
-        padding: 22px 28px;
-        border-radius: 0 0 22px 22px;
-        border-top: 3px solid var(--blue);
-      }
-
-      .decision strong {
-        display: block;
-        margin-bottom: 3px;
-        font-size: 20px;
-      }
-
-      .decision p,
-      .phase p,
-      .phase small,
-      .meta {
-        margin: 0;
-        color: var(--muted);
-      }
-
-      .cutoff {
-        min-width: 190px;
-        padding: 12px 16px;
-        border-radius: 14px;
-        background: var(--blue-soft);
-        color: var(--blue);
-        text-align: center;
-        font-weight: 800;
-      }
-
-      .section-title {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 16px;
-        margin: 28px 2px 12px;
-      }
-
-      h2 {
-        margin: 0;
-        font-size: 19px;
-        letter-spacing: -0.02em;
-      }
-
-      .meta {
-        font-size: 13px;
-      }
-
-      .phases {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-      }
-
-      .phase {
-        position: relative;
-        min-height: 158px;
-        overflow: hidden;
-        padding: 18px;
-        border: 1px solid var(--line);
-        border-radius: 18px;
-        background: var(--paper);
-      }
-
-      .phase::before {
-        position: absolute;
-        inset: 0 0 auto;
-        height: 5px;
-        background: var(--phase-color);
-        content: "";
-      }
-
-      .phase.complete {
-        --phase-color: var(--green);
-        background: linear-gradient(150deg, var(--green-soft), #fff 56%);
-      }
-
-      .phase.current {
-        --phase-color: var(--blue);
-        background: linear-gradient(150deg, var(--blue-soft), #fff 56%);
-      }
-
-      .phase.write {
-        --phase-color: var(--violet);
-        background: linear-gradient(150deg, var(--violet-soft), #fff 56%);
-      }
-
-      .phase.polish {
-        --phase-color: var(--amber);
-        background: linear-gradient(150deg, var(--amber-soft), #fff 56%);
-      }
-
-      .phase-state {
-        color: var(--phase-color);
-      }
-
-      .phase h3 {
-        margin: 14px 0 4px;
-        font-size: 21px;
-      }
-
-      .phase small {
-        display: block;
-        margin-bottom: 14px;
-        font-weight: 700;
-      }
-
-      .lower {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr;
-        gap: 14px;
-        margin-top: 14px;
-      }
-
-      .panel {
-        padding: 20px 22px;
-        border-radius: 18px;
-        box-shadow: 0 10px 28px rgba(38, 55, 78, 0.08);
-      }
-
-      table {
-        width: 100%;
-        margin-top: 12px;
-        border-collapse: collapse;
-        font-size: 13px;
-      }
-
-      th {
-        padding: 0 10px 8px;
-        color: var(--muted);
+      .source-badge {
+        max-width: none;
         text-align: left;
       }
 
-      td {
-        padding: 9px 10px;
-        border-top: 1px solid var(--line);
-        vertical-align: top;
+      .decision-surface {
+        margin-bottom: 28px;
       }
 
-      td:first-child {
-        color: var(--blue);
-        font-weight: 800;
-        white-space: nowrap;
+      .interpretation {
+        padding: 20px 19px 21px 25px;
       }
 
-      .gates {
-        display: grid;
-        gap: 8px;
-        margin-top: 12px;
+      .section-note {
+        max-width: none;
+        text-align: left;
       }
 
-      .gate {
-        display: grid;
+      .phase-list,
+      .agenda-list {
+        grid-template-columns: 1fr;
+      }
+
+      .relationship-panel {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .gate-list li {
         grid-template-columns: 24px 1fr;
-        gap: 10px;
-        align-items: start;
-        padding: 9px 10px;
-        border-radius: 12px;
-        background: #f7f9fc;
-        font-size: 13px;
       }
 
-      .box {
-        display: grid;
-        width: 20px;
-        height: 20px;
-        place-items: center;
-        border: 2px solid #a9b6c7;
-        border-radius: 6px;
-        color: transparent;
+      .gate-state {
+        grid-column: 2;
+        text-align: left;
       }
 
-      footer {
-        margin: 18px 4px 0;
-        color: var(--muted);
-        font-size: 12px;
+      .dependency-map li {
+        grid-template-columns: 1fr;
+        gap: 4px;
       }
 
-      @media (max-width: 900px) {
-        .phases,
-        .lower {
-          grid-template-columns: 1fr 1fr;
-        }
+      .dependency-arrow {
+        text-align: left;
+        transform: rotate(90deg);
+        transform-origin: 12px center;
       }
 
-      @media (max-width: 620px) {
-        main {
-          width: min(100% - 24px, 1180px);
-        }
-
-        .masthead,
-        .decision {
-          grid-template-columns: 1fr;
-          display: grid;
-        }
-
-        .stamp {
-          text-align: left;
-        }
-
-        .phases,
-        .lower {
-          grid-template-columns: 1fr;
-        }
+      footer p:last-child {
+        text-align: left;
       }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header class="masthead">
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .page {
+        width: 100%;
+        padding: 0;
+      }
+
+      .skip-link {
+        display: none;
+      }
+
+      .interpretation,
+      .source-summary,
+      .phase-card,
+      .gate-panel,
+      .risk-panel {
+        box-shadow: none;
+      }
+
+      section,
+      .phase-card,
+      .agenda-item,
+      .gate-panel,
+      .risk-panel {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to sprint timeline</a>
+
+  <div class="page">
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">Publication plan · October 2026</p>
+        <h1>Publication Sprint</h1>
+      </div>
+      <p class="source-badge">Synthetic example · not a real publication</p>
+    </header>
+
+    <div class="decision-surface">
+      <aside class="interpretation" aria-labelledby="interpretation-title">
+        <p class="micro-label" id="interpretation-title">Interpretation of the source</p>
+        <p>
+          Proceed, but do not call the package ready: analysis is underway,
+          writing and polish remain planned, and all four submission gates are
+          still unmarked.
+        </p>
+      </aside>
+
+      <dl class="source-summary">
         <div>
-          <div class="eyebrow">Temporal plan · rich HTML</div>
-          <h1>Publication Sprint</h1>
+          <dt>Window</dt>
+          <dd><time datetime="2026-10-05">Oct 5</time>–<time datetime="2026-10-18">18, 2026</time></dd>
         </div>
-        <div class="stamp">
-          source.gpt.md<br>
-          synthetic example
-        </div>
-      </header>
-
-      <section class="decision" aria-label="Submission decision">
         <div>
-          <strong>Proceed toward submission.</strong>
-          <p>
-            The outline is approved and the analysis draft is
-            underway. Readiness requires all four gates.
+          <dt>Decision</dt>
+          <dd>Proceed toward submission</dd>
+        </div>
+        <div>
+          <dt>Now</dt>
+          <dd>Outline approved; analysis draft underway</dd>
+        </div>
+      </dl>
+    </div>
+
+    <main id="main-content">
+      <section aria-labelledby="timeline-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Phase backbone</p>
+            <h2 id="timeline-title">Four phases, one conditional finish</h2>
+          </div>
+          <p class="section-note">
+            State labels are sourced. The connecting sequence shows how each
+            outcome hands work to the next phase.
           </p>
         </div>
-        <div class="cutoff">October 18 cutoff</div>
+
+        <ol class="phase-list">
+          <li class="phase complete">
+            <article class="phase-card">
+              <div class="phase-top">
+                <span class="phase-index" aria-hidden="true"></span>
+                <span class="status complete">Complete</span>
+              </div>
+              <div class="phase-body">
+                <h3>Set up</h3>
+                <p class="phase-dates">
+                  <time datetime="2026-10-05">Oct 5</time>–<time datetime="2026-10-06">6</time>
+                </p>
+                <p class="phase-outcome">Sources organized and outline approved</p>
+              </div>
+            </article>
+          </li>
+
+          <li class="phase current">
+            <article class="phase-card">
+              <div class="phase-top">
+                <span class="phase-index" aria-hidden="true"></span>
+                <span class="status current">Current</span>
+              </div>
+              <div class="phase-body">
+                <h3>Analyze</h3>
+                <p class="phase-dates">
+                  <time datetime="2026-10-07">Oct 7</time>–<time datetime="2026-10-11">11</time>
+                </p>
+                <p class="phase-outcome">Evidence grouped into four findings</p>
+              </div>
+            </article>
+          </li>
+
+          <li class="phase planned">
+            <article class="phase-card">
+              <div class="phase-top">
+                <span class="phase-index" aria-hidden="true"></span>
+                <span class="status planned">Planned</span>
+              </div>
+              <div class="phase-body">
+                <h3>Write</h3>
+                <p class="phase-dates">
+                  <time datetime="2026-10-12">Oct 12</time>–<time datetime="2026-10-15">15</time>
+                </p>
+                <p class="phase-outcome">Full narrative draft</p>
+              </div>
+            </article>
+          </li>
+
+          <li class="phase planned">
+            <article class="phase-card">
+              <div class="phase-top">
+                <span class="phase-index" aria-hidden="true"></span>
+                <span class="status planned">Planned</span>
+              </div>
+              <div class="phase-body">
+                <h3>Polish</h3>
+                <p class="phase-dates">
+                  <time datetime="2026-10-16">Oct 16</time>–<time datetime="2026-10-18">18</time>
+                </p>
+                <p class="phase-outcome">Review, formatting, and submission</p>
+              </div>
+            </article>
+          </li>
+        </ol>
+
+        <aside class="relationship-panel" aria-labelledby="handoff-title">
+          <h3 id="handoff-title">Critical handoff</h3>
+          <p>
+            <strong>Analysis closes Oct 11</strong> when findings three and four
+            are drafted; <strong>writing opens Oct 12</strong> when the
+            introduction and findings are connected.
+          </p>
+        </aside>
       </section>
 
-      <div class="section-title">
-        <h2>Four-phase backbone</h2>
-        <div class="meta">October 5-18, 2026</div>
-      </div>
-
-      <section class="phases" aria-label="Sprint phases">
-        <article class="phase complete">
-          <div class="phase-state">Complete</div>
-          <h3>Set up</h3>
-          <small>Oct 5-6</small>
-          <p>Sources organized and outline approved.</p>
-        </article>
-        <article class="phase current">
-          <div class="phase-state">Current</div>
-          <h3>Analyze</h3>
-          <small>Oct 7-11</small>
-          <p>Group the evidence into four findings.</p>
-        </article>
-        <article class="phase write">
-          <div class="phase-state">Planned</div>
-          <h3>Write</h3>
-          <small>Oct 12-15</small>
-          <p>Connect the introduction and full narrative.</p>
-        </article>
-        <article class="phase polish">
-          <div class="phase-state">Planned</div>
-          <h3>Polish</h3>
-          <small>Oct 16-18</small>
-          <p>Review, format, and submit the package.</p>
-        </article>
-      </section>
-
-      <section class="lower">
-        <article class="panel">
-          <h2>Near-term agenda</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Focus</th>
-                <th>Exit condition</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Oct 9</td>
-                <td>Finish evidence grouping</td>
-                <td>Four findings have source notes</td>
-              </tr>
-              <tr>
-                <td>Oct 10</td>
-                <td>Draft findings one and two</td>
-                <td>Each finding has one example</td>
-              </tr>
-              <tr>
-                <td>Oct 11</td>
-                <td>Draft findings three and four</td>
-                <td>Analysis phase is complete</td>
-              </tr>
-              <tr>
-                <td>Oct 12</td>
-                <td>Begin full narrative</td>
-                <td>Introduction and findings are connected</td>
-              </tr>
-            </tbody>
-          </table>
-        </article>
-
-        <article class="panel">
-          <h2>Submission gates</h2>
-          <div class="gates">
-            <div class="gate" role="checkbox" aria-checked="false">
-              <span class="box" aria-hidden="true"></span>
-              <span>Every finding traces to a source note.</span>
-            </div>
-            <div class="gate" role="checkbox" aria-checked="false">
-              <span class="box" aria-hidden="true"></span>
-              <span>The abstract reports results.</span>
-            </div>
-            <div class="gate" role="checkbox" aria-checked="false">
-              <span class="box" aria-hidden="true"></span>
-              <span>The document matches the required format.</span>
-            </div>
-            <div class="gate" role="checkbox" aria-checked="false">
-              <span class="box" aria-hidden="true"></span>
-              <span>A final reader pass is incorporated.</span>
-            </div>
+      <section aria-labelledby="agenda-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Near-term zoom</p>
+            <h2 id="agenda-title">The next four dated exits</h2>
           </div>
-        </article>
+          <p class="section-note">
+            Each day is framed by its sourced focus and exit condition.
+          </p>
+        </div>
+
+        <ol class="agenda-list">
+          <li class="agenda-item">
+            <time class="agenda-date" datetime="2026-10-09">Oct 9</time>
+            <h3>Finish evidence grouping</h3>
+            <p>
+              <span class="exit-label">Exit condition</span>
+              Four findings have source notes
+            </p>
+          </li>
+          <li class="agenda-item">
+            <time class="agenda-date" datetime="2026-10-10">Oct 10</time>
+            <h3>Draft findings one and two</h3>
+            <p>
+              <span class="exit-label">Exit condition</span>
+              Each finding has one example
+            </p>
+          </li>
+          <li class="agenda-item">
+            <time class="agenda-date" datetime="2026-10-11">Oct 11</time>
+            <h3>Draft findings three and four</h3>
+            <p>
+              <span class="exit-label">Exit condition</span>
+              Analysis phase is complete
+            </p>
+            <span class="cutoff-note">Protected analysis cutoff</span>
+          </li>
+          <li class="agenda-item">
+            <time class="agenda-date" datetime="2026-10-12">Oct 12</time>
+            <h3>Begin full narrative</h3>
+            <p>
+              <span class="exit-label">Exit condition</span>
+              Introduction and findings are connected
+            </p>
+          </li>
+        </ol>
       </section>
 
-      <footer>
-        Synthetic HTMLify showcase · facts retained from
-        source.gpt.md
-      </footer>
+      <section aria-labelledby="readiness-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Submission readiness</p>
+            <h2 id="readiness-title">Four gates remain unmarked</h2>
+          </div>
+          <p class="section-note">
+            Unchecked boxes mirror the source; they do not claim the work is
+            impossible or complete.
+          </p>
+        </div>
+
+        <div class="readiness-grid">
+          <div class="gate-panel">
+            <p class="gate-rule">
+              The package is ready only when all four gates are clear by
+              <time datetime="2026-10-18">October 18</time>.
+            </p>
+            <ul class="gate-list">
+              <li>
+                <span class="empty-check" aria-hidden="true"></span>
+                <span>Every finding traces to a source note.</span>
+                <span class="gate-state">Not marked clear</span>
+              </li>
+              <li>
+                <span class="empty-check" aria-hidden="true"></span>
+                <span>The abstract reports results rather than intentions.</span>
+                <span class="gate-state">Not marked clear</span>
+              </li>
+              <li>
+                <span class="empty-check" aria-hidden="true"></span>
+                <span>The document matches the required format.</span>
+                <span class="gate-state">Not marked clear</span>
+              </li>
+              <li>
+                <span class="empty-check" aria-hidden="true"></span>
+                <span>A final reader pass is incorporated.</span>
+                <span class="gate-state">Not marked clear</span>
+              </li>
+            </ul>
+          </div>
+
+          <aside class="risk-panel" aria-labelledby="risks-title">
+            <header>
+              <p class="section-kicker">Schedule uncertainty</p>
+              <h3 id="risks-title">Risks and protections</h3>
+            </header>
+            <ul class="risk-list">
+              <li>
+                <p>Evidence grouping may run one day late.</p>
+                <p class="protection">Protect October 11 as the analysis cutoff.</p>
+              </li>
+              <li>
+                <p>Formatting work may crowd the final review.</p>
+                <p class="protection">Freeze content before October 17.</p>
+              </li>
+            </ul>
+          </aside>
+        </div>
+      </section>
+
+      <section aria-labelledby="relationships-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Readiness relationships</p>
+            <h2 id="relationships-title">What controls the finish</h2>
+          </div>
+          <p class="section-note">
+            These links restate the source’s dates, exit conditions, risks, and
+            readiness rule.
+          </p>
+        </div>
+
+        <ul class="dependency-map">
+          <li>
+            <span class="dependency-from">Evidence grouping may slip</span>
+            <span class="dependency-arrow" aria-hidden="true">→</span>
+            <span class="dependency-to">Protect the Oct 11 analysis cutoff</span>
+          </li>
+          <li>
+            <span class="dependency-from">Analysis phase completes</span>
+            <span class="dependency-arrow" aria-hidden="true">→</span>
+            <span class="dependency-to">Connect the introduction and findings on Oct 12</span>
+          </li>
+          <li>
+            <span class="dependency-from">Formatting may crowd review</span>
+            <span class="dependency-arrow" aria-hidden="true">→</span>
+            <span class="dependency-to">Freeze content before Oct 17</span>
+          </li>
+          <li>
+            <span class="dependency-from">All four gates clear by Oct 18</span>
+            <span class="dependency-arrow" aria-hidden="true">→</span>
+            <span class="dependency-to">Only then is the package ready</span>
+          </li>
+        </ul>
+      </section>
     </main>
-  </body>
+
+    <footer>
+      <p>
+        Source note: This is synthetic example material created to demonstrate
+        HTMLify. It does not describe a real publication.
+      </p>
+      <p>Curated from <strong>source.gpt.md</strong> · Self-contained HTML</p>
+    </footer>
+  </div>
+</body>
 </html>

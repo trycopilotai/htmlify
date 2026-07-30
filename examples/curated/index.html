@@ -1,26 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>Release Readiness — Hold</title>
+  <title>Synthetic Release Readiness Review</title>
   <style>
     :root {
-      --ink: #17213b;
-      --muted: #62708b;
-      --line: #dce2ec;
-      --surface: #ffffff;
-      --canvas: #f4f6fa;
-      --navy: #101a34;
-      --ready: #167456;
-      --ready-soft: #e8f4ef;
-      --pending: #b44a2a;
-      --pending-soft: #fff0ea;
-      --cutoff: #6c4ad1;
-      --cutoff-soft: #f0edff;
-      --shadow: 0 18px 45px rgba(22, 32, 59, 0.09);
-      --radius: 18px;
+      --canvas: #f2f0e8;
+      --surface: #fffdf8;
+      --surface-strong: #ffffff;
+      --ink: #17231f;
+      --muted: #58635e;
+      --line: #d8d8ce;
+      --deep: #102b24;
+      --deep-soft: #1d4036;
+      --accent: #f4b85a;
+      --ready: #17633d;
+      --ready-bg: #e6f4eb;
+      --pending: #8e2f12;
+      --pending-bg: #ffebe3;
+      --outside: #4f5b56;
+      --outside-bg: #eceeea;
+      --shadow: 0 18px 48px rgba(25, 39, 34, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
     }
 
     * {
@@ -29,181 +34,266 @@
 
     html {
       background: var(--canvas);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
     }
 
     body {
       margin: 0;
-      color: var(--ink);
+      min-width: 320px;
       background:
-        radial-gradient(circle at 92% 2%, rgba(108, 74, 209, 0.08), transparent 24rem),
+        radial-gradient(circle at 6% 0%, rgba(244, 184, 90, 0.16), transparent 28rem),
         var(--canvas);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
     }
 
-    .shell {
-      width: min(1280px, calc(100% - 64px));
+    a {
+      color: inherit;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 10;
+      top: 12px;
+      left: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--surface-strong);
+      color: var(--ink);
+      font-weight: 750;
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+      transform: translateY(0);
+    }
+
+    .page-shell {
+      width: min(1280px, calc(100% - 48px));
       margin: 0 auto;
     }
 
-    .masthead {
+    .site-header {
       display: flex;
-      min-height: 78px;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-between;
-      gap: 24px;
-      border-bottom: 1px solid rgba(23, 33, 59, 0.10);
+      gap: 28px;
+      padding: 30px 0 20px;
     }
 
-    .eyebrow {
+    .eyebrow,
+    .section-kicker,
+    .card-label {
       margin: 0;
-      color: var(--cutoff);
-      font-size: 0.75rem;
-      font-weight: 800;
-      letter-spacing: 0.13em;
-      text-transform: uppercase;
-    }
-
-    .masthead h1 {
-      margin: 2px 0 0;
-      font-size: 1.08rem;
-      letter-spacing: -0.01em;
-    }
-
-    .stamp {
-      display: flex;
-      align-items: center;
-      gap: 12px;
       color: var(--muted);
-      font-size: 0.78rem;
-      white-space: nowrap;
-    }
-
-    .stamp code {
-      color: var(--ink);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.76rem;
-    }
-
-    .stamp span + span {
-      padding-left: 12px;
-      border-left: 1px solid var(--line);
-    }
-
-    main {
-      padding: 28px 0 56px;
-    }
-
-    .decision {
-      display: grid;
-      grid-template-columns: 0.82fr 1.18fr;
-      min-height: 210px;
-      overflow: hidden;
-      border-radius: 24px;
-      background: var(--navy);
-      box-shadow: var(--shadow);
-    }
-
-    .decision-state {
-      display: grid;
-      align-content: center;
-      padding: 30px 36px;
-      color: #fff;
-      background:
-        linear-gradient(135deg, rgba(180, 74, 42, 0.98), rgba(154, 55, 38, 0.96));
-    }
-
-    .decision-state .eyebrow {
-      color: #ffe0d5;
-    }
-
-    .decision-state h2 {
-      margin: 2px 0 3px;
-      font-size: clamp(3.8rem, 6vw, 5.4rem);
-      line-height: 0.95;
-      letter-spacing: -0.07em;
-    }
-
-    .decision-state p {
-      max-width: 34ch;
-      margin: 8px 0 0;
-      color: #fff6f2;
-      font-size: 1.02rem;
-    }
-
-    .decision-basis {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-content: center;
-      gap: 24px 30px;
-      padding: 28px 34px;
-      color: #fff;
-    }
-
-    .metric {
-      padding-right: 22px;
-      border-right: 1px solid rgba(255, 255, 255, 0.14);
-    }
-
-    .metric strong {
-      display: block;
-      font-size: 2.35rem;
-      line-height: 1;
-      letter-spacing: -0.05em;
-    }
-
-    .metric span,
-    .cutoff-summary span {
-      display: block;
-      margin-top: 8px;
-      color: #aeb8d0;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
-    .cutoff-summary strong {
-      display: block;
-      font-size: 1.15rem;
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 0;
+      font-size: clamp(1.65rem, 3vw, 2.55rem);
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    h2 {
+      margin-bottom: 8px;
+      font-size: clamp(1.3rem, 2vw, 1.7rem);
+      line-height: 1.2;
+      letter-spacing: -0.025em;
+    }
+
+    h3 {
+      margin-bottom: 12px;
+      font-size: 1rem;
       line-height: 1.25;
     }
 
-    .rule {
-      grid-column: 1 / -1;
+    .header-note {
+      max-width: 420px;
       margin: 0;
-      padding-top: 18px;
-      border-top: 1px solid rgba(255, 255, 255, 0.14);
-      color: #d4daea;
-      font-size: 0.92rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: right;
     }
 
-    .rule b {
-      color: #fff;
+    main {
+      padding-bottom: 22px;
     }
 
-    .section {
-      margin-top: 24px;
-      padding: 24px 26px 26px;
+    .decision-panel {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+      gap: 18px;
+      overflow: hidden;
+      padding: clamp(24px, 4vw, 42px);
+      border: 1px solid #1d4036;
+      border-radius: var(--radius-lg);
+      background: var(--deep);
+      box-shadow: var(--shadow);
+      color: #ffffff;
+    }
+
+    .decision-panel::after {
+      position: absolute;
+      right: -90px;
+      bottom: -155px;
+      width: 340px;
+      height: 340px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 45px rgba(255, 255, 255, 0.025),
+        0 0 0 90px rgba(255, 255, 255, 0.02);
+      content: "";
+      pointer-events: none;
+    }
+
+    .decision-copy,
+    .decision-evidence {
+      position: relative;
+      z-index: 1;
+    }
+
+    .decision-panel .section-kicker {
+      color: #cbd8d2;
+    }
+
+    .decision-state {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 10px 0 14px;
+    }
+
+    .decision-state strong {
+      font-size: clamp(3rem, 7vw, 5.4rem);
+      font-weight: 850;
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+    }
+
+    .state-marker {
+      display: inline-flex;
+      align-items: center;
+      min-height: 31px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #332207;
+      font-size: 0.8rem;
+      font-weight: 850;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .decision-summary {
+      max-width: 670px;
+      margin-bottom: 24px;
+      color: #edf4f1;
+      font-size: clamp(1rem, 1.8vw, 1.18rem);
+    }
+
+    .rule {
+      max-width: 760px;
+      margin: 0;
+      padding: 14px 16px;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: rgba(255, 255, 255, 0.075);
+      color: #f8fbf9;
+      font-size: 0.9rem;
+    }
+
+    .rule strong {
+      color: #ffffff;
+    }
+
+    .decision-evidence {
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+
+    .evidence-card {
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.075);
+    }
+
+    .evidence-card .card-label {
+      margin-bottom: 6px;
+      color: #cbd8d2;
+    }
+
+    .gate-count {
+      margin: 0;
+      color: #ffffff;
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    .derived-note {
+      display: block;
+      margin-top: 4px;
+      color: #cbd8d2;
+      font-size: 0.78rem;
+    }
+
+    .blocker-name {
+      margin-bottom: 4px;
+      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 800;
+    }
+
+    .blocker-detail {
+      margin: 0;
+      color: #dce7e2;
+      font-size: 0.88rem;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(340px, 0.55fr);
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .content-grid > *,
+    .surface {
+      min-width: 0;
+    }
+
+    .surface {
+      padding: 24px;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       background: var(--surface);
-      box-shadow: 0 10px 30px rgba(22, 32, 59, 0.05);
     }
 
     .section-heading {
       display: flex;
-      align-items: flex-end;
+      align-items: end;
       justify-content: space-between;
-      gap: 24px;
-      margin-bottom: 17px;
-    }
-
-    .section-heading h2 {
-      margin: 1px 0 0;
-      font-size: 1.25rem;
-      letter-spacing: -0.02em;
+      gap: 18px;
+      margin-bottom: 18px;
     }
 
     .section-heading p {
@@ -212,70 +302,70 @@
       font-size: 0.86rem;
     }
 
-    .gate-count {
-      color: var(--muted);
-      font-size: 0.85rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .gate-count .ready-text {
-      color: var(--ready);
-    }
-
-    .gate-count .pending-text {
-      color: var(--pending);
-    }
-
-    .gates {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .gate {
-      position: relative;
-      min-height: 126px;
-      padding: 18px 17px 16px;
-      overflow: hidden;
+    .table-scroll {
+      overflow-x: auto;
       border: 1px solid var(--line);
-      border-radius: 14px;
-      background: #fbfcfe;
+      border-radius: var(--radius-md);
+      background: var(--surface-strong);
     }
 
-    .gate::before {
+    .table-scroll:focus {
+      outline: 3px solid #b36a16;
+      outline-offset: 3px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 670px;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    caption {
       position: absolute;
-      inset: 0 auto 0 0;
-      width: 4px;
-      background: var(--ready);
-      content: "";
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
     }
 
-    .gate.pending {
-      border-color: #efbaa9;
-      background: var(--pending-soft);
+    th,
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
     }
 
-    .gate.pending::before {
-      background: var(--pending);
+    th {
+      background: #f5f4ee;
+      color: #4c5752;
+      font-size: 0.76rem;
+      font-weight: 850;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
     }
 
-    .gate-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    td:first-child {
+      font-weight: 760;
     }
 
     .status {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      color: var(--ready);
-      font-size: 0.7rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+      gap: 7px;
+      min-height: 28px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 820;
+      white-space: nowrap;
     }
 
     .status::before {
@@ -286,139 +376,110 @@
       content: "";
     }
 
-    .pending .status {
+    .status-ready {
+      background: var(--ready-bg);
+      color: var(--ready);
+    }
+
+    .status-pending {
+      background: var(--pending-bg);
       color: var(--pending);
     }
 
-    .owner {
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: 700;
-    }
-
-    .gate h3 {
-      margin: 10px 0 4px;
-      font-size: 0.98rem;
-      line-height: 1.2;
-    }
-
-    .gate p {
+    .timeline {
       margin: 0;
-      color: var(--muted);
-      font-size: 0.79rem;
-      line-height: 1.35;
+      padding: 0;
+      list-style: none;
     }
 
-    .milestones {
-      margin-top: 18px;
-      padding: 0 8px;
-    }
-
-    .milestone-track {
+    .timeline li {
       position: relative;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0;
+      grid-template-columns: 92px 1fr;
+      gap: 16px;
+      min-height: 70px;
+      padding-left: 25px;
     }
 
-    .milestone-track::before {
+    .timeline li::before {
       position: absolute;
-      top: 10px;
-      right: 16.67%;
-      left: 16.67%;
-      height: 2px;
+      top: 6px;
+      left: 3px;
+      z-index: 1;
+      width: 11px;
+      height: 11px;
+      border: 3px solid var(--surface);
+      border-radius: 50%;
+      background: var(--deep-soft);
+      box-shadow: 0 0 0 1px var(--deep-soft);
+      content: "";
+    }
+
+    .timeline li::after {
+      position: absolute;
+      top: 18px;
+      bottom: -5px;
+      left: 8px;
+      width: 1px;
       background: var(--line);
       content: "";
     }
 
-    .milestone {
-      position: relative;
-      z-index: 1;
-      text-align: center;
+    .timeline li:last-child::after {
+      display: none;
     }
 
-    .milestone-dot {
-      display: block;
-      width: 20px;
-      height: 20px;
-      margin: 0 auto 8px;
-      border: 5px solid #fff;
-      border-radius: 50%;
-      background: #8190ad;
-      box-shadow: 0 0 0 1px #8190ad;
-    }
-
-    .milestone.cutoff .milestone-dot {
-      background: var(--cutoff);
-      box-shadow: 0 0 0 3px var(--cutoff-soft);
-    }
-
-    .milestone.release .milestone-dot {
-      background: var(--pending);
-      box-shadow: 0 0 0 1px var(--pending);
-    }
-
-    .milestone time {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: 800;
-    }
-
-    .milestone b {
-      display: block;
-      margin-top: 1px;
-      font-size: 0.86rem;
-    }
-
-    .milestone small {
-      display: block;
-      margin-top: 2px;
+    .timeline time {
       color: var(--muted);
-      font-size: 0.71rem;
+      font-size: 0.78rem;
+      font-weight: 760;
+      line-height: 1.35;
     }
 
-    .cutoff-tag {
-      display: inline-block;
-      margin-top: 5px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      color: var(--cutoff);
-      background: var(--cutoff-soft);
-      font-size: 0.66rem;
-      font-weight: 800;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
+    .timeline strong {
+      font-size: 0.92rem;
+      line-height: 1.35;
     }
 
-    .supporting {
-      margin-top: 34px;
+    .cutoff {
+      color: var(--pending);
     }
 
-    .supporting > .section-heading {
-      margin-bottom: 14px;
+    .question {
+      margin: 12px 0 0;
+      padding: 15px 16px;
+      border-radius: var(--radius-md);
+      background: #fff3d9;
+      color: #51380c;
+      font-size: 0.88rem;
     }
 
-    .supporting-grid {
+    .question strong {
+      display: block;
+      margin-bottom: 3px;
+      color: #3b2808;
+    }
+
+    .workstreams {
       display: grid;
-      grid-template-columns: 1fr 1fr 0.9fr;
-      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
     }
 
-    .workstream,
-    .question-card {
+    .stream-card {
       padding: 22px;
       border: 1px solid var(--line);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       background: var(--surface);
     }
 
-    .workstream h3,
-    .question-card h3 {
-      margin: 3px 0 15px;
-      font-size: 1.04rem;
+    .stream-card h2 {
+      margin-bottom: 16px;
+      font-size: 1.2rem;
     }
 
-    .workstream ul {
+    .stream-list {
       display: grid;
       gap: 11px;
       margin: 0;
@@ -426,336 +487,332 @@
       list-style: none;
     }
 
-    .workstream li {
-      display: grid;
-      grid-template-columns: 10px 1fr;
-      gap: 10px;
-      color: #34405b;
-      font-size: 0.86rem;
+    .stream-list li {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding-top: 11px;
+      border-top: 1px solid var(--line);
+      font-size: 0.9rem;
     }
 
-    .workstream li::before {
-      width: 8px;
-      height: 8px;
-      margin-top: 0.38rem;
-      border-radius: 50%;
-      background: #95a1b8;
-      content: "";
+    .stream-list li:first-child {
+      padding-top: 0;
+      border-top: 0;
     }
 
-    .workstream li.ready::before {
-      background: var(--ready);
-    }
-
-    .workstream li.pending::before {
-      background: var(--pending);
-    }
-
-    .question-card {
-      color: #fff;
-      border-color: var(--navy);
-      background: var(--navy);
-    }
-
-    .question-card .eyebrow {
-      color: #bfb0ff;
-    }
-
-    .question-card h3 {
-      color: #fff;
-    }
-
-    .question-card p {
-      margin: 0;
-      color: #cbd3e6;
-      font-size: 0.88rem;
-    }
-
-    .question-card .open {
-      display: inline-block;
-      margin-top: 18px;
-      padding: 5px 10px;
-      border: 1px solid rgba(255, 255, 255, 0.24);
-      border-radius: 999px;
-      color: #fff;
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
+    .compact-state {
+      flex: 0 0 auto;
+      color: var(--ready);
+      font-size: 0.77rem;
+      font-weight: 820;
       text-transform: uppercase;
     }
 
-    footer {
-      display: flex;
-      justify-content: space-between;
-      gap: 24px;
-      margin-top: 28px;
-      padding-top: 18px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 0.76rem;
+    .compact-state.pending {
+      color: var(--pending);
     }
 
-    footer p {
+    .compact-state.outside {
+      color: var(--outside);
+    }
+
+    .page-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px 0 28px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .page-footer p {
       margin: 0;
     }
 
+    .source-path {
+      color: var(--ink);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      overflow-wrap: anywhere;
+    }
+
     @media (max-width: 900px) {
-      .shell {
-        width: min(100% - 32px, 760px);
-      }
-
-      .masthead,
-      footer {
+      .site-header,
+      .section-heading,
+      .page-footer {
         align-items: flex-start;
         flex-direction: column;
-        padding: 18px 0;
       }
 
-      .stamp {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 3px;
-        white-space: normal;
+      .header-note {
+        max-width: 700px;
+        text-align: left;
       }
 
-      .stamp span + span {
-        padding-left: 0;
-        border-left: 0;
-      }
-
-      .decision {
+      .decision-panel,
+      .content-grid {
         grid-template-columns: 1fr;
       }
 
-      .gates,
-      .supporting-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .question-card {
-        grid-column: 1 / -1;
+      .decision-evidence {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 600px) {
-      .gates,
-      .supporting-grid,
-      .decision-basis {
-        grid-template-columns: 1fr;
+    @media (max-width: 620px) {
+      .page-shell {
+        width: min(100% - 28px, 1280px);
       }
 
-      .metric {
-        padding-right: 0;
-        border-right: 0;
+      .site-header {
+        gap: 10px;
+        padding: 22px 0 16px;
       }
 
-      .rule {
-        grid-column: auto;
+      .decision-panel,
+      .surface,
+      .stream-card {
+        border-radius: 18px;
       }
 
-      .section-heading {
+      .decision-panel {
+        padding: 22px 18px;
+      }
+
+      .decision-state {
         align-items: flex-start;
         flex-direction: column;
-        gap: 6px;
+        gap: 10px;
       }
 
-      .milestone-track::before {
-        display: none;
-      }
-
-      .milestone-track {
+      .decision-evidence,
+      .workstreams {
         grid-template-columns: 1fr;
-        gap: 18px;
       }
 
-      .question-card {
-        grid-column: auto;
+      .surface,
+      .stream-card {
+        padding: 18px;
+      }
+
+      .timeline li {
+        grid-template-columns: 78px 1fr;
+        gap: 10px;
+      }
+
+      .stream-list li {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
       }
     }
 
     @media print {
       @page {
-        margin: 0.55in;
+        margin: 12mm;
+        size: A4 portrait;
       }
 
       body {
-        background: #fff;
-        color: #000;
+        background: #ffffff;
       }
 
-      .shell {
+      .page-shell {
         width: 100%;
       }
 
-      .decision,
-      .section,
-      .workstream,
-      .question-card {
-        break-inside: avoid;
-        box-shadow: none;
+      .site-header {
+        padding-top: 0;
       }
 
-      .supporting {
-        break-before: page;
+      .decision-panel {
+        break-inside: avoid;
+        box-shadow: none;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .content-grid,
+      .workstreams {
+        break-inside: avoid;
+      }
+
+      .page-footer {
+        padding-bottom: 0;
       }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <header class="masthead">
-      <div>
-        <p class="eyebrow">Synthetic release readiness review</p>
-        <h1>Thursday release decision surface</h1>
-      </div>
-      <div class="stamp" aria-label="Source and generation details">
-        <span>Source: <code>release-readiness.gpt.md</code></span>
-        <span>Generated: <time datetime="2026-07-28">2026-07-28</time></span>
-      </div>
-    </header>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <main>
-      <section class="decision" aria-labelledby="decision-title">
+  <header class="site-header page-shell">
+    <div>
+      <p class="eyebrow">Synthetic fixture · Thursday release</p>
+      <h1>Synthetic Release Readiness Review</h1>
+    </div>
+    <p class="header-note">
+      This fictional Thursday release tests whether the decision is separated from its supporting status detail.
+    </p>
+  </header>
+
+  <main id="main-content" class="page-shell">
+    <section class="decision-panel" aria-labelledby="decision-title">
+      <div class="decision-copy">
+        <p class="section-kicker">Current decision · sourced conclusion</p>
         <div class="decision-state">
-          <p class="eyebrow">Current release decision</p>
-          <h2 id="decision-title">HOLD</h2>
-          <p>The PDF smoke test is pending, so the Thursday ship condition is not met.</p>
+          <strong id="decision-title">Hold</strong>
+          <span class="state-marker">1 required gate pending</span>
         </div>
-        <div class="decision-basis">
-          <div class="metric">
-            <strong>3 / 4</strong>
-            <span>Required gates ready</span>
-          </div>
-          <div class="cutoff-summary">
-            <strong>Wednesday<br>16:00 UTC</strong>
-            <span>Required-gate cutoff</span>
-          </div>
-          <p class="rule"><b>Decision rule:</b> Ship on Thursday only when every required gate is ready by the cutoff. Any pending required gate changes the decision to hold.</p>
-        </div>
-      </section>
+        <p class="decision-summary">
+          The Thursday candidate is on hold because the PDF smoke test is pending.
+        </p>
+        <p class="rule">
+          <strong>Decision rule:</strong> Ship on Thursday only when every required gate is ready by
+          Wednesday at 16:00 UTC. A pending required gate changes the decision to hold.
+        </p>
+      </div>
 
-      <section class="section" aria-labelledby="gates-title">
+      <div class="decision-evidence">
+        <article class="evidence-card">
+          <p class="card-label">Required gates</p>
+          <p class="gate-count">3 of 4 ready</p>
+          <span class="derived-note">Derived from the sourced gate states below</span>
+        </article>
+        <article class="evidence-card">
+          <p class="card-label">Blocking evidence</p>
+          <p class="blocker-name">PDF smoke test · Team B</p>
+          <p class="blocker-detail">Pending — backend run not recorded.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section class="surface" aria-labelledby="gates-title">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Release condition</p>
+            <p class="section-kicker">Supporting status</p>
             <h2 id="gates-title">Required gates</h2>
           </div>
-          <div class="gate-count" aria-label="Three gates ready and one gate pending">
-            <span class="ready-text">3 ready</span> · <span class="pending-text">1 pending</span>
-          </div>
+          <p>All four must be ready by the cutoff.</p>
         </div>
 
-        <div class="gates">
-          <article class="gate">
-            <div class="gate-top">
-              <span class="status">Ready</span>
-              <span class="owner">Team A</span>
-            </div>
-            <h3>HTML parser</h3>
-            <p>Offline suite passed</p>
-          </article>
-
-          <article class="gate pending">
-            <div class="gate-top">
-              <span class="status">Pending</span>
-              <span class="owner">Team B</span>
-            </div>
-            <h3>PDF smoke test</h3>
-            <p>Backend run not recorded</p>
-          </article>
-
-          <article class="gate">
-            <div class="gate-top">
-              <span class="status">Ready</span>
-              <span class="owner">Team C</span>
-            </div>
-            <h3>Clean install</h3>
-            <p>Two clean installs passed</p>
-          </article>
-
-          <article class="gate">
-            <div class="gate-top">
-              <span class="status">Ready</span>
-              <span class="owner">Team D</span>
-            </div>
-            <h3>Disclosure review</h3>
-            <p>Tree and history scans passed</p>
-          </article>
-        </div>
-
-        <div class="milestones" aria-labelledby="milestones-title">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">Release sequence</p>
-              <h2 id="milestones-title">Milestones</h2>
-            </div>
-          </div>
-          <div class="milestone-track">
-            <div class="milestone">
-              <span class="milestone-dot" aria-hidden="true"></span>
-              <time>Tuesday 12:00 UTC</time>
-              <b>Inputs frozen</b>
-            </div>
-            <div class="milestone cutoff">
-              <span class="milestone-dot" aria-hidden="true"></span>
-              <time>Wednesday 16:00 UTC</time>
-              <b>Required-gate cutoff</b>
-              <span class="cutoff-tag">Decision point</span>
-            </div>
-            <div class="milestone release">
-              <span class="milestone-dot" aria-hidden="true"></span>
-              <time>Thursday 09:00 UTC</time>
-              <b>Candidate release</b>
-              <small>Condition currently unmet</small>
-            </div>
-          </div>
-        </div>
+        <section class="table-scroll" tabindex="0" aria-label="Required gates table, horizontally scrollable on narrow screens">
+          <table>
+            <caption>Required release gates with owners, states, and evidence</caption>
+            <thead>
+              <tr>
+                <th scope="col">Gate</th>
+                <th scope="col">Owner</th>
+                <th scope="col">State</th>
+                <th scope="col">Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>HTML parser</td>
+                <td>Team A</td>
+                <td><span class="status status-ready">Ready</span></td>
+                <td>Offline suite passed</td>
+              </tr>
+              <tr>
+                <td>PDF smoke test</td>
+                <td>Team B</td>
+                <td><span class="status status-pending">Pending</span></td>
+                <td>Backend run not recorded</td>
+              </tr>
+              <tr>
+                <td>Clean install</td>
+                <td>Team C</td>
+                <td><span class="status status-ready">Ready</span></td>
+                <td>Two clean installs passed</td>
+              </tr>
+              <tr>
+                <td>Disclosure review</td>
+                <td>Team D</td>
+                <td><span class="status status-ready">Ready</span></td>
+                <td>Tree and history scans passed</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
       </section>
 
-      <section class="supporting" aria-labelledby="supporting-title">
+      <section class="surface" aria-labelledby="milestones-title">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">Context, not release gates</p>
-            <h2 id="supporting-title">Supporting workstreams</h2>
+            <p class="section-kicker">Release sequence</p>
+            <h2 id="milestones-title">Milestones</h2>
           </div>
-          <p>These items inform readiness but are separate from the required-gate decision rule.</p>
         </div>
 
-        <div class="supporting-grid">
-          <article class="workstream">
-            <p class="eyebrow">Workstream</p>
-            <h3>Rendering</h3>
-            <ul>
-              <li class="ready">Curated HTML is ready.</li>
-              <li class="ready">Formal HTML is ready.</li>
-              <li class="pending">PDF export remains pending.</li>
-            </ul>
-          </article>
+        <ol class="timeline">
+          <li>
+            <time>Tuesday<br>12:00 UTC</time>
+            <strong>Inputs frozen</strong>
+          </li>
+          <li>
+            <time>Wednesday<br>16:00 UTC</time>
+            <strong class="cutoff">Required-gate cutoff</strong>
+          </li>
+          <li>
+            <time>Thursday<br>09:00 UTC</time>
+            <strong>Candidate release</strong>
+          </li>
+        </ol>
 
-          <article class="workstream">
-            <p class="eyebrow">Workstream</p>
-            <h3>Distribution</h3>
-            <ul>
-              <li>The package includes the skill file and three scripts.</li>
-              <li>The marketplace catalogue entry is drafted.</li>
-              <li>Public publication is outside this fixture.</li>
-            </ul>
-          </article>
-
-          <aside class="question-card" aria-labelledby="question-title">
-            <p class="eyebrow">Unresolved</p>
-            <h3 id="question-title">Which PDF backend will provide the recorded smoke test?</h3>
-            <p>Backend run not recorded.</p>
-            <span class="open">Open question</span>
-          </aside>
-        </div>
+        <p class="question">
+          <strong>Open question</strong>
+          Which PDF backend will provide the recorded smoke test?
+        </p>
       </section>
-    </main>
+    </div>
 
-    <footer>
-      <p>Curated from the synthetic source; no external dependencies.</p>
-      <p>Source facts and the decision interpretation are presented separately from supporting workstreams.</p>
-    </footer>
-  </div>
+    <div class="workstreams">
+      <section class="stream-card" aria-labelledby="rendering-title">
+        <p class="section-kicker">Workstream</p>
+        <h2 id="rendering-title">Rendering</h2>
+        <ul class="stream-list">
+          <li>
+            <span>Curated HTML</span>
+            <span class="compact-state">Ready</span>
+          </li>
+          <li>
+            <span>Formal HTML</span>
+            <span class="compact-state">Ready</span>
+          </li>
+          <li>
+            <span>PDF export</span>
+            <span class="compact-state pending">Pending</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="stream-card" aria-labelledby="distribution-title">
+        <p class="section-kicker">Workstream</p>
+        <h2 id="distribution-title">Distribution</h2>
+        <ul class="stream-list">
+          <li>
+            <span>The package includes the skill file and three scripts.</span>
+            <span class="compact-state">Included</span>
+          </li>
+          <li>
+            <span>The marketplace catalogue entry is drafted.</span>
+            <span class="compact-state">Drafted</span>
+          </li>
+          <li>
+            <span>Public publication</span>
+            <span class="compact-state outside">Outside fixture</span>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <footer class="page-footer page-shell">
+    <p>Curated decision surface · source facts and derived summary are labeled separately.</p>
+    <p>Source: <span class="source-path">examples/curated/release-readiness.gpt.md</span></p>
+  </footer>
 </body>
 </html>
