@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
+import argparse
 import html
 import shutil
+import struct
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 
@@ -23,6 +26,14 @@ def require_program(name: str) -> str:
     if path is None:
         raise SystemExit(f"Required program not found: {name}")
     return path
+
+
+def find_imagemagick() -> str:
+    for name in ("magick", "convert"):
+        path = shutil.which(name)
+        if path is not None:
+            return path
+    raise SystemExit("ImageMagick is required")
 
 
 def find_chrome() -> str:
@@ -50,21 +61,51 @@ def capture(
     width: int,
     height: int,
 ) -> None:
-    subprocess.run(
-        [
-            chrome,
-            "--headless=new",
-            "--disable-gpu",
-            "--hide-scrollbars",
-            "--no-sandbox",
-            f"--window-size={width},{height}",
-            f"--screenshot={destination}",
-            source.resolve().as_uri(),
-        ],
-        check=True,
-        capture_output=True,
-        timeout=30,
+    profile = destination.parent / (
+        f"{destination.stem}-chrome-profile"
     )
+    command = [
+        chrome,
+        "--headless=new",
+        "--disable-gpu",
+        "--hide-scrollbars",
+        "--no-sandbox",
+        "--disable-background-networking",
+        "--disable-component-update",
+        "--disable-default-apps",
+        "--disable-sync",
+        "--metrics-recording-only",
+        "--no-first-run",
+        "--no-default-browser-check",
+        f"--user-data-dir={profile}",
+        f"--window-size={width},{height}",
+        f"--screenshot={destination}",
+        source.resolve().as_uri(),
+    ]
+    process = subprocess.Popen(
+        command,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline:
+        if (
+            destination.is_file()
+            and destination.stat().st_size > 0
+        ):
+            break
+        if process.poll() is not None:
+            break
+        time.sleep(0.1)
+
+    if process.poll() is None:
+        process.terminate()
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait(timeout=5)
+
     if not destination.is_file():
         raise SystemExit(f"Screenshot missing: {destination}")
     if destination.stat().st_size == 0:
@@ -164,7 +205,7 @@ def write_source_view(
         line-height: 22px;
       }}
       li::marker {{
-        color: #667287;
+        color: #78859a;
         font-size: 12px;
       }}
       code {{
@@ -287,6 +328,7 @@ def build_showcase(
     chrome: str,
     magick: str,
     work: Path,
+    output_root: Path,
     slug: str,
     title: str,
 ) -> None:
@@ -329,18 +371,74 @@ def build_showcase(
 
     build_poster(
         frames[-1],
-        ASSETS / f"{slug}-poster.gpt.png",
+        output_root / f"{slug}-poster.gpt.png",
     )
     build_animation(
         magick,
         frames,
-        ASSETS / f"{slug}.gpt.gif",
+        output_root / f"{slug}.gpt.gif",
     )
 
 
-def build() -> None:
-    magick = require_program("magick")
+def png_dimensions(path: Path) -> tuple[int, int]:
+    data = path.read_bytes()
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise SystemExit(f"Not a PNG: {path}")
+    return struct.unpack(">II", data[16:24])
+
+
+def gif_dimensions(path: Path) -> tuple[int, int]:
+    data = path.read_bytes()
+    if data[:6] not in (b"GIF87a", b"GIF89a"):
+        raise SystemExit(f"Not a GIF: {path}")
+    return struct.unpack("<HH", data[6:10])
+
+
+def gif_delays(path: Path) -> list[int]:
+    data = path.read_bytes()
+    marker = b"\x21\xf9\x04"
+    delays = []
+    offset = 0
+    while True:
+        offset = data.find(marker, offset)
+        if offset == -1:
+            break
+        delays.append(
+            struct.unpack("<H", data[offset + 4 : offset + 6])[
+                0
+            ]
+        )
+        offset += len(marker)
+    return delays
+
+
+def validate_assets(output_root: Path) -> None:
+    social = output_root / "social-preview.png"
+    if png_dimensions(social) != (1280, 640):
+        raise SystemExit(
+            f"Unexpected social preview dimensions: {social}"
+        )
+    for slug, _title in SHOWCASES:
+        poster = output_root / f"{slug}-poster.gpt.png"
+        animation = output_root / f"{slug}.gpt.gif"
+        if png_dimensions(poster) != (1280, 720):
+            raise SystemExit(
+                f"Unexpected poster dimensions: {poster}"
+            )
+        if gif_dimensions(animation) != (1280, 720):
+            raise SystemExit(
+                f"Unexpected animation dimensions: {animation}"
+            )
+        if gif_delays(animation) != [100, 100, 200]:
+            raise SystemExit(
+                f"Unexpected animation timing: {animation}"
+            )
+
+
+def build(output_root: Path = ASSETS) -> None:
+    magick = find_imagemagick()
     chrome = find_chrome()
+    output_root.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory(
         prefix="htmlify-assets-"
@@ -359,7 +457,7 @@ def build() -> None:
                 magick,
                 str(social_capture),
                 "-strip",
-                str(ASSETS / "social-preview.png"),
+                str(output_root / "social-preview.png"),
             ],
             check=True,
         )
@@ -369,10 +467,34 @@ def build() -> None:
                 chrome,
                 magick,
                 work,
+                output_root,
                 slug,
                 title,
             )
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=ASSETS,
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    build()
+    arguments = parse_args()
+    if arguments.check:
+        with tempfile.TemporaryDirectory(
+            prefix="htmlify-assets-check-"
+        ) as temporary:
+            destination = Path(temporary)
+            build(destination)
+            validate_assets(destination)
+    else:
+        build(arguments.output_dir)
