@@ -94,11 +94,6 @@ visual progression across three retained design checkpoints.
 
 ## Use it
 
-| Agent       | Direct invocation | Marketplace invocation |
-| ----------- | ----------------- | ---------------------- |
-| Claude Code | `/htmlify`        | `/htmlify:htmlify`     |
-| Codex       | `$htmlify`        | `$htmlify`             |
-
 ### Claude Code
 
 Install the tagged skill package:
@@ -118,7 +113,7 @@ rollback_install() {
   fi
 }
 trap rollback_install EXIT
-git clone --quiet --depth 1 --branch v0.2.0 \
+git clone --quiet --depth 1 --branch v0.2.1 \
   https://github.com/trycopilotai/htmlify \
   "$install_tmp/htmlify"
 mkdir -p "$install_stage"
@@ -131,15 +126,7 @@ trap - EXIT
 rm -rf "$install_tmp"
 ```
 
-Or install it from the trycopilot.ai marketplace:
-
-```text
-/plugin marketplace add trycopilotai/skills
-/plugin install htmlify@trycopilotai
-```
-
-Invoke the directly installed skill as `/htmlify`. Invoke the
-marketplace plugin as `/htmlify:htmlify`.
+Invoke the directly installed skill as `/htmlify`.
 
 ### Codex
 
@@ -160,7 +147,7 @@ rollback_install() {
   fi
 }
 trap rollback_install EXIT
-git clone --quiet --depth 1 --branch v0.2.0 \
+git clone --quiet --depth 1 --branch v0.2.1 \
   https://github.com/trycopilotai/htmlify \
   "$install_tmp/htmlify"
 mkdir -p "$install_stage"
@@ -173,21 +160,12 @@ trap - EXIT
 rm -rf "$install_tmp"
 ```
 
-Or install it from the trycopilot.ai marketplace:
+Invoke the directly installed skill as `$htmlify`.
 
-```sh
-npx -y @openai/codex plugin marketplace add \
-  trycopilotai/skills --ref main
-npx -y @openai/codex plugin add \
-  htmlify@trycopilotai
-```
-
-Invoke either Codex installation as `$htmlify`.
-
-The `v0.2.0` package carries Claude Code and Codex plugin
+The `v0.2.1` repository carries Claude Code and Codex plugin
 manifests. `skill/SKILL.md` resolves to the package both
-runtimes load under `skills/htmlify`, so the skill content is
-stored once.
+runtimes load under `skills/htmlify`, so the skill content
+is stored once.
 
 For either agent, ask it to visualize, compare, dashboard,
 timeline, inspect, render, print, or export Markdown. Ask
@@ -244,12 +222,12 @@ the hashes and fail when prose, generated assets, or
 manifests drift.
 
 The three synthetic showcases commit their source, formal
-HTML, rich HTML, final run record, and manifest
-together. `make assets` rebuilds each three-frame animation
-in that order. `make check` regenerates the assets in an
-isolated directory and verifies their dimensions and timing.
-The machine-readable contrast audit records the text and
-color pairs checked during release QA. Tests recompute every
+HTML, rich HTML, final run record, and manifest together.
+`make assets` rebuilds each three-frame animation in that
+order. `make check` regenerates the assets in an isolated
+directory and verifies their dimensions and timing. The
+machine-readable contrast audit records the text and color
+pairs checked during release QA. Tests recompute every
 declared ratio, fail below 4.5:1, and confirm the recorded
 color tokens remain in the relevant source document.
 
