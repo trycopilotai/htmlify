@@ -16,6 +16,30 @@ SCRIPTS = ROOT / "skill" / "scripts"
 README = ROOT / "README.md"
 PACKAGE = ROOT / "skills" / "htmlify"
 COMPATIBILITY_PATH = ROOT / "skill"
+RELEASE_VERSION = "0.2.1"
+OPENAI_DEFAULT_PROMPT = (
+    "Use $htmlify to turn this Markdown into a "
+    "source-checked HTML decision surface."
+)
+
+
+def read_wrapped_yaml_string(
+    path: Path,
+    key: str,
+) -> str:
+    """Read the quoted scalar shape emitted by Prettier."""
+    lines = path.read_text(encoding="utf-8").splitlines()
+    marker = f"  {key}:"
+    for index, line in enumerate(lines):
+        if line != marker:
+            continue
+        fragments = []
+        for continuation in lines[index + 1 :]:
+            if not continuation.startswith("    "):
+                break
+            fragments.append(continuation.strip())
+        return json.loads(" ".join(fragments))
+    raise AssertionError(f"Missing {key!r} in {path}")
 
 
 class SourcePolicyTests(unittest.TestCase):
@@ -29,17 +53,26 @@ class SourcePolicyTests(unittest.TestCase):
         self.assertFalse(canonical_skill.is_symlink())
         self.assertTrue(openai_yaml.is_file())
         self.assertFalse(openai_yaml.is_symlink())
+        openai_text = openai_yaml.read_text(encoding="utf-8")
         self.assertEqual(
-            openai_yaml.read_text(encoding="utf-8"),
+            openai_text,
             (
                 "interface:\n"
                 '  display_name: "htmlify"\n'
-                "  short_description: "
-                '"Turn Markdown into source-checked HTML"\n'
-                "  default_prompt: "
-                '"Use $htmlify to turn this Markdown into a '
-                'source-checked HTML decision surface."\n'
+                "  short_description:\n"
+                '    "Turn Markdown into source-checked HTML"\n'
+                "  default_prompt:\n"
+                '    "Use $htmlify to turn this Markdown into a\n'
+                '    source-checked HTML decision surface."\n'
             ),
+        )
+        openai_default_prompt = read_wrapped_yaml_string(
+            openai_yaml,
+            "default_prompt",
+        )
+        self.assertEqual(
+            openai_default_prompt,
+            OPENAI_DEFAULT_PROMPT,
         )
 
         self.assertTrue(COMPATIBILITY_PATH.is_symlink())
@@ -75,8 +108,16 @@ class SourcePolicyTests(unittest.TestCase):
         for field in shared_fields:
             self.assertEqual(claude[field], codex[field])
         self.assertEqual(claude["name"], "htmlify")
-        self.assertEqual(claude["version"], "0.2.0")
+        self.assertEqual(
+            claude["version"],
+            RELEASE_VERSION,
+        )
+        self.assertEqual(claude["skills"], "./skills/")
         self.assertEqual(codex["skills"], "./skills/")
+        self.assertEqual(
+            codex["interface"]["defaultPrompt"],
+            [openai_default_prompt],
+        )
 
     def test_complete_runtime_is_inside_skill_package(self) -> None:
         expected = {
@@ -154,13 +195,41 @@ class SourcePolicyTests(unittest.TestCase):
 
         self.assertIn("### Claude Code", text)
         self.assertIn("### Codex", text)
-        self.assertIn("--branch v0.2.0", text)
-        self.assertIn("/htmlify:htmlify", text)
-        self.assertIn("$htmlify", text)
+        self.assertEqual(
+            text.count(f"--branch v{RELEASE_VERSION}"),
+            2,
+        )
+        self.assertEqual(
+            set(
+                re.findall(
+                    r"--branch v([0-9]+\.[0-9]+\.[0-9]+)",
+                    text,
+                )
+            ),
+            {RELEASE_VERSION},
+        )
         self.assertIn(
-            "npx -y @openai/codex plugin marketplace add",
+            f"The `v{RELEASE_VERSION}` repository",
             text,
         )
+        claude_section = text.split(
+            "### Claude Code",
+            1,
+        )[1].split("### Codex", 1)[0]
+        codex_section = text.split("### Codex", 1)[1]
+        self.assertIn(
+            "Invoke the directly installed skill as "
+            "`/htmlify`.",
+            claude_section,
+        )
+        self.assertIn(
+            "Invoke the directly installed skill as "
+            "`$htmlify`.",
+            codex_section,
+        )
+        self.assertNotIn("trycopilotai/skills", text)
+        self.assertNotIn("/htmlify:htmlify", text)
+        self.assertNotIn("--ref main", text)
         self.assertEqual(
             text.count(
                 'mv "$install_target" "$install_tmp/previous"'
