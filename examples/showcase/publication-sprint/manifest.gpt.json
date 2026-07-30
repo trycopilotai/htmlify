@@ -14,7 +14,8 @@
   "output_edit_method": "original agent session continuation",
   "run_record": {
     "kind": "output-last-message",
-    "edited": false
+    "edited": true,
+    "edit_method": "Prettier 3.7.4 repository Markdown codec"
   },
   "visual_qa": {
     "desktop": "Headless Chrome 150 screenshot at 1280x720",
@@ -26,6 +27,6 @@
     "examples/showcase/publication-sprint/source.gpt.md": "01810a25a0c5040aa17b07c94428b6b35616dae58a35f40bc8faac0a1749ffb6",
     "examples/showcase/publication-sprint/formal.gpt.html": "18a8c07ac4563d2fb5c49cf0119a598abd729141d5856dcb1f97a87d8f90c2c6",
     "examples/showcase/publication-sprint/rich.gpt.html": "faa003efedc2e72dab460ae018bb132dc204fc5964320bc21384c5427b269f1d",
-    "examples/showcase/publication-sprint/run.gpt.md": "2a326e73303cf371867af0416d00e0bf620ef1bfc8a29812491fd1ce492eea9d"
+    "examples/showcase/publication-sprint/run.gpt.md": "95367a8ced705e166bb0bc5cd2550c128be220480e3837464923756c3578a63d"
   }
 }

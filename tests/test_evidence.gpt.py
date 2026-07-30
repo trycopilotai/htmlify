@@ -108,7 +108,11 @@ class EvidenceTest(unittest.TestCase):
                     manifest["run_record"],
                     {
                         "kind": "output-last-message",
-                        "edited": False,
+                        "edited": True,
+                        "edit_method": (
+                            "Prettier 3.7.4 repository "
+                            "Markdown codec"
+                        ),
                     },
                 )
                 self.assertTrue(manifest["output_edited"])
@@ -201,7 +205,11 @@ class EvidenceTest(unittest.TestCase):
                 manifest["run_record"],
                 {
                     "kind": "output-last-message",
-                    "edited": False,
+                    "edited": True,
+                    "edit_method": (
+                        "Prettier 3.7.4 repository "
+                        "Markdown codec"
+                    ),
                 },
             )
             self.assertEqual(

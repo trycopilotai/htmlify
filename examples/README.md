@@ -40,9 +40,9 @@ make assets
 The release-evidence examples exercise both `htmlify` modes
 with synthetic source material.
 
-| Mode    | Source contract                 | Retained output            |
-| ------- | ------------------------------- | -------------------------- |
-| Curated | Interpret facts into a decision | Self-contained HTML        |
+| Mode    | Source contract                 | Retained output                  |
+| ------- | ------------------------------- | -------------------------------- |
+| Curated | Interpret facts into a decision | Self-contained HTML              |
 | Formal  | Preserve order for print        | Deterministic HTML; optional PDF |
 
 Each release-evidence example has a machine-readable
@@ -69,7 +69,6 @@ document-level overflow at 390 by 844 pixels. Its output is
 one model run, not a promise that every agent or model will
 make the same design choices.
 
-The
-[contrast audit](contrast-audit.gpt.json)
-records the foreground/background pairs that the test suite
-holds to a 4.5:1 minimum.
+The [contrast audit](contrast-audit.gpt.json) records the
+foreground/background pairs that the test suite holds to a
+4.5:1 minimum.
