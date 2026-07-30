@@ -227,7 +227,7 @@ Figures were fetched from GitHub on 2026-07-29.
 | Project                                                               |         GitHub figures | Primary surface                                               | Formal print runtime                          |
 | --------------------------------------------------------------------- | ---------------------: | ------------------------------------------------------------- | --------------------------------------------- |
 | `htmlify`                                                             |                    New | Source-checked Markdown decision surfaces                     | Bundled HTML renderer and optional PDF export |
-| [`visual-explainer`](https://github.com/nicobailon/visual-explainer)  | 9,356 stars, 630 forks | Broad diagrams, plan reviews, data tables, recaps, and slides | Not its stated primary surface                |
+| [`visual-explainer`](https://github.com/nicobailon/visual-explainer)  | 9,357 stars, 630 forks | Broad diagrams, plan reviews, data tables, recaps, and slides | Not its stated primary surface                |
 | [`markdown-viewer/skills`](https://github.com/markdown-viewer/skills) | 3,104 stars, 178 forks | Diagram and visualization engines embedded in Markdown        | Not its stated primary surface                |
 
 Rich self-contained HTML is established table stakes.

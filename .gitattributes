@@ -1,0 +1,3 @@
+# Preserve the exact final run record, including its Markdown
+# hard break, without treating that evidence byte as an error.
+examples/showcase/design-evolution/run.gpt.md whitespace=-trailing-space
