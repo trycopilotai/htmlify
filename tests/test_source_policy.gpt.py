@@ -75,6 +75,7 @@ class SourcePolicyTests(unittest.TestCase):
         for field in shared_fields:
             self.assertEqual(claude[field], codex[field])
         self.assertEqual(claude["name"], "htmlify")
+        self.assertEqual(claude["version"], "0.2.0")
         self.assertEqual(codex["skills"], "./skills/")
 
     def test_complete_runtime_is_inside_skill_package(self) -> None:
@@ -146,12 +147,46 @@ class SourcePolicyTests(unittest.TestCase):
                     target,
                 )
 
-    def test_install_command_copies_package_contents(self) -> None:
+    def test_install_command_replaces_complete_package(
+        self,
+    ) -> None:
         text = README.read_text(encoding="utf-8")
 
+        self.assertIn("### Claude Code", text)
+        self.assertIn("### Codex", text)
+        self.assertIn("--branch v0.2.0", text)
+        self.assertIn("/htmlify:htmlify", text)
+        self.assertIn("$htmlify", text)
         self.assertIn(
-            'cp -R "$install_tmp/htmlify/skill/."',
+            "npx -y @openai/codex plugin marketplace add",
             text,
+        )
+        self.assertEqual(
+            text.count(
+                'mv "$install_target" "$install_tmp/previous"'
+            ),
+            2,
+        )
+        self.assertEqual(
+            text.count(
+                'cp -R "$install_tmp/htmlify/skill/." '
+                '"$install_stage/"'
+            ),
+            2,
+        )
+        self.assertEqual(
+            text.count('mv "$install_stage" "$install_target"'),
+            2,
+        )
+        self.assertEqual(
+            text.count(
+                'mktemp -d "$install_parent/.htmlify.XXXXXX"'
+            ),
+            2,
+        )
+        self.assertEqual(
+            text.count("trap rollback_install EXIT"),
+            2,
         )
         self.assertNotIn("dependency-free", text.lower())
 

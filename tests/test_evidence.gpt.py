@@ -1,10 +1,12 @@
 import hashlib
 import importlib.util
 import json
+import math
 import struct
 import subprocess
 import tempfile
 import unittest
+from html.parser import HTMLParser
 from pathlib import Path
 
 
@@ -16,6 +18,10 @@ SHOWCASE_SLUGS = (
     "publication-sprint",
     "control-plane-status",
     "design-evolution",
+)
+RELEASE_SKILL_SHA256 = (
+    "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded"
+    "9704aaaf0d8185d64c8a7"
 )
 
 
@@ -29,13 +35,57 @@ def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def git_blob(commit: str, relative_path: str) -> bytes:
+    result = subprocess.run(
+        ["git", "show", f"{commit}:{relative_path}"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+    )
+    return result.stdout
+
+
+class SemanticHTMLParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.problems: list[str] = []
+
+    def handle_starttag(
+        self,
+        tag: str,
+        attributes: list[tuple[str, str | None]],
+    ) -> None:
+        values = dict(attributes)
+        aria_label = values.get("aria-label")
+        if aria_label is not None:
+            if tag in {"div", "dl", "ol", "ul"}:
+                self.problems.append(
+                    f"<{tag}> misuses aria-label: {aria_label}"
+                )
+        if tag == "div" and values.get("role") == "region":
+            self.problems.append(
+                '<div role="region"> should be a native section'
+            )
+
+
 class EvidenceTest(unittest.TestCase):
     def test_example_manifests_match_files(self) -> None:
         for mode in ("curated", "formal"):
             manifest_path = (
                 EXAMPLES / mode / "manifest.gpt.json"
             )
+            manifest_text = manifest_path.read_text(
+                encoding="utf-8"
+            )
             manifest = read_json(manifest_path)
+            self.assertNotRegex(
+                manifest_text,
+                (
+                    r"\b[0-9a-f]{8}-[0-9a-f]{4}-"
+                    r"[0-9a-f]{4}-[0-9a-f]{4}-"
+                    r"[0-9a-f]{12}\b"
+                ),
+            )
             self.assertEqual(manifest["mode"], mode)
             self.assertEqual(
                 manifest["input_commit"],
@@ -43,7 +93,44 @@ class EvidenceTest(unittest.TestCase):
             )
             self.assertEqual(
                 manifest["skill_sha256"],
+                RELEASE_SKILL_SHA256,
+            )
+            self.assertEqual(
                 sha256(ROOT / "skill" / "SKILL.md"),
+                RELEASE_SKILL_SHA256,
+            )
+            if mode == "curated":
+                source_relative = (
+                    "examples/curated/"
+                    "release-readiness.gpt.md"
+                )
+                self.assertEqual(
+                    manifest["run_record"],
+                    {
+                        "kind": "output-last-message",
+                        "edited": False,
+                    },
+                )
+                self.assertTrue(manifest["output_edited"])
+                self.assertEqual(
+                    manifest["output_edit_method"],
+                    "original agent session continuation",
+                )
+                self.assertGreaterEqual(
+                    len(manifest["follow_up_prompts"]),
+                    2,
+                )
+            else:
+                source_relative = (
+                    "examples/formal/delivery-brief.gpt.md"
+                )
+            self.assertEqual(
+                git_blob(
+                    manifest["input_commit"],
+                    source_relative,
+                ),
+                (ROOT / source_relative).read_bytes(),
+                source_relative,
             )
 
             for relative_path, expected in manifest[
@@ -56,6 +143,87 @@ class EvidenceTest(unittest.TestCase):
                     relative_path,
                 )
 
+    def test_showcase_manifests_match_real_runs(self) -> None:
+        for slug in SHOWCASE_SLUGS:
+            showcase = EXAMPLES / "showcase" / slug
+            manifest = read_json(
+                showcase / "manifest.gpt.json"
+            )
+            manifest_text = (
+                showcase / "manifest.gpt.json"
+            ).read_text(encoding="utf-8")
+            self.assertNotRegex(
+                manifest_text,
+                (
+                    r"\b[0-9a-f]{8}-[0-9a-f]{4}-"
+                    r"[0-9a-f]{4}-[0-9a-f]{4}-"
+                    r"[0-9a-f]{12}\b"
+                ),
+            )
+            self.assertGreaterEqual(
+                len(manifest["follow_up_prompts"]),
+                1,
+            )
+            transcript = (
+                showcase / "run.gpt.md"
+            ).read_text(encoding="utf-8")
+
+            self.assertEqual(manifest["mode"], "curated")
+            self.assertEqual(
+                manifest["input_commit"],
+                "e3d5173",
+            )
+            self.assertEqual(
+                manifest["skill_sha256"],
+                RELEASE_SKILL_SHA256,
+            )
+            self.assertEqual(
+                manifest["agent_version"],
+                "codex-cli 0.146.0",
+            )
+            source_relative = (
+                f"examples/showcase/{slug}/source.gpt.md"
+            )
+            self.assertEqual(
+                git_blob(
+                    manifest["input_commit"],
+                    source_relative,
+                ),
+                (ROOT / source_relative).read_bytes(),
+                source_relative,
+            )
+            self.assertTrue(manifest["output_edited"])
+            self.assertEqual(
+                manifest["output_edit_method"],
+                "original agent session continuation",
+            )
+            self.assertEqual(
+                manifest["run_record"],
+                {
+                    "kind": "output-last-message",
+                    "edited": False,
+                },
+            )
+            self.assertEqual(
+                manifest["visual_qa"]["result"],
+                "passed",
+            )
+            self.assertIn(
+                f"examples/showcase/{slug}/rich.gpt.html",
+                transcript,
+            )
+            self.assertNotIn("/Users/", transcript)
+            self.assertNotIn("/tmp/", transcript)
+
+            for relative_path, expected in manifest[
+                "files"
+            ].items():
+                self.assertEqual(
+                    sha256(ROOT / relative_path),
+                    expected,
+                    relative_path,
+                )
+
     def test_formal_manifest_records_live_backend(
         self,
     ) -> None:
@@ -64,7 +232,7 @@ class EvidenceTest(unittest.TestCase):
         )
         self.assertEqual(manifest["pdf_backend"], "chrome")
         self.assertEqual(manifest["pdf_pages"], 1)
-        self.assertFalse(manifest["edited"])
+        self.assertFalse(manifest["output_edited"])
 
     def test_curated_transcript_names_public_paths(
         self,
@@ -72,15 +240,12 @@ class EvidenceTest(unittest.TestCase):
         transcript = (
             EXAMPLES / "curated" / "run.gpt.md"
         ).read_text(encoding="utf-8")
-        self.assertIn("Selected mode: curated", transcript)
+        self.assertIn("**Mode:** Curated", transcript)
         self.assertIn(
             "examples/curated/release-readiness.gpt.md",
             transcript,
         )
-        self.assertIn(
-            "examples/curated/index.html",
-            transcript,
-        )
+        self.assertIn("examples/curated/index.html", transcript)
         self.assertNotIn("/Users/", transcript)
         self.assertNotIn("/tmp/", transcript)
 
@@ -134,6 +299,8 @@ class EvidenceTest(unittest.TestCase):
             "source.gpt.md",
             "formal.gpt.html",
             "rich.gpt.html",
+            "manifest.gpt.json",
+            "run.gpt.md",
         }
         for slug in SHOWCASE_SLUGS:
             showcase = EXAMPLES / "showcase" / slug
@@ -156,6 +323,70 @@ class EvidenceTest(unittest.TestCase):
             self.assertIn("synthetic example", source.lower())
             self.assertIn("<html", formal.lower())
             self.assertIn("<html", rich.lower())
+
+    def test_declared_text_contrast_meets_wcag_aa(
+        self,
+    ) -> None:
+        audit = read_json(
+            EXAMPLES / "contrast-audit.gpt.json"
+        )
+        minimum = audit["minimum_ratio"]
+        for relative_path, pairs in audit[
+            "documents"
+        ].items():
+            document = (
+                ROOT / relative_path
+            ).read_text(encoding="utf-8").lower()
+            for pair in pairs:
+                ratio = self.contrast_ratio(
+                    pair["foreground"],
+                    pair["background"],
+                )
+                self.assertGreaterEqual(
+                    ratio,
+                    minimum,
+                    (
+                        f"{relative_path}: {pair['label']} "
+                        f"{ratio:.2f}:1"
+                    ),
+                )
+                tokens = pair.get("tokens")
+                if tokens is None:
+                    tokens = [
+                        pair["foreground"],
+                        pair["background"],
+                    ]
+                for token in tokens:
+                    self.assertIn(
+                        token.lower(),
+                        document,
+                        f"{relative_path}: {pair['label']}",
+                    )
+
+    def test_curated_html_uses_native_labelled_semantics(
+        self,
+    ) -> None:
+        paths = [
+            EXAMPLES / "curated" / "index.html",
+        ]
+        for slug in SHOWCASE_SLUGS:
+            paths.append(
+                EXAMPLES
+                / "showcase"
+                / slug
+                / "rich.gpt.html"
+            )
+
+        for path in paths:
+            document = path.read_text(encoding="utf-8")
+            self.assertTrue(
+                document.startswith("<!DOCTYPE html>"),
+                path,
+            )
+            parser = SemanticHTMLParser()
+            parser.feed(document)
+            parser.close()
+            self.assertEqual(parser.problems, [], path)
 
     def test_formal_showcases_rederive_from_source(
         self,
@@ -203,9 +434,12 @@ class EvidenceTest(unittest.TestCase):
         self.assertNotIn("✓", publication)
         self.assertEqual(
             publication.count(
-                'class="gate" role="checkbox" '
-                'aria-checked="false"'
+                'class="empty-check" aria-hidden="true"'
             ),
+            4,
+        )
+        self.assertEqual(
+            publication.count("Not marked clear"),
             4,
         )
 
@@ -226,13 +460,9 @@ class EvidenceTest(unittest.TestCase):
             / "design-evolution"
             / "rich.gpt.html"
         ).read_text(encoding="utf-8")
-        self.assertRegex(
-            design,
-            (
-                r"\.micro span:nth-child\(3\) \{\s+"
-                r"font-size: 32px;"
-            ),
-        )
+        for size in ("12 px", "16 px", "32 px"):
+            self.assertIn(size, design)
+        self.assertIn("0 O 1 I l", design)
 
     def test_asset_builder_orders_source_formal_rich(
         self,
@@ -297,6 +527,7 @@ class EvidenceTest(unittest.TestCase):
                 "chrome",
                 "magick",
                 Path(temporary),
+                ASSETS,
                 "publication-sprint",
                 "Publication sprint",
             )
@@ -313,6 +544,37 @@ class EvidenceTest(unittest.TestCase):
             ],
         )
         self.assertEqual(poster_frames, ["rich-frame.png"])
+
+    def test_asset_validation_rejects_bad_timing(
+        self,
+    ) -> None:
+        specification = importlib.util.spec_from_file_location(
+            "htmlify_asset_builder_validation",
+            BUILD_SCRIPT,
+        )
+        if specification is None:
+            self.fail("Could not load the asset builder")
+        if specification.loader is None:
+            self.fail("Asset builder has no loader")
+
+        builder = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(builder)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            output_root = Path(temporary)
+            (output_root / "social-preview.png").write_bytes(
+                self.png_header(1280, 640)
+            )
+            for slug in SHOWCASE_SLUGS:
+                (
+                    output_root / f"{slug}-poster.gpt.png"
+                ).write_bytes(self.png_header(1280, 720))
+                (
+                    output_root / f"{slug}.gpt.gif"
+                ).write_bytes(self.gif_header(1280, 720))
+
+            with self.assertRaises(SystemExit):
+                builder.validate_assets(output_root)
 
     def test_evidence_lock_matches_reader_surfaces(
         self,
@@ -386,6 +648,50 @@ class EvidenceTest(unittest.TestCase):
             )
             offset += len(marker)
         return delays
+
+    @staticmethod
+    def png_header(width: int, height: int) -> bytes:
+        return (
+            b"\x89PNG\r\n\x1a\n"
+            + b"\x00" * 8
+            + struct.pack(">II", width, height)
+        )
+
+    @staticmethod
+    def gif_header(width: int, height: int) -> bytes:
+        return b"GIF89a" + struct.pack("<HH", width, height)
+
+    @staticmethod
+    def contrast_ratio(
+        foreground: str,
+        background: str,
+    ) -> float:
+        first = EvidenceTest.relative_luminance(foreground)
+        second = EvidenceTest.relative_luminance(background)
+        lighter = max(first, second)
+        darker = min(first, second)
+        return (lighter + 0.05) / (darker + 0.05)
+
+    @staticmethod
+    def relative_luminance(color: str) -> float:
+        value = color.removeprefix("#")
+        channels = []
+        for offset in (0, 2, 4):
+            channel = int(value[offset : offset + 2], 16)
+            normalized = channel / 255
+            if normalized <= 0.04045:
+                linear = normalized / 12.92
+            else:
+                linear = math.pow(
+                    (normalized + 0.055) / 1.055,
+                    2.4,
+                )
+            channels.append(linear)
+        return (
+            0.2126 * channels[0]
+            + 0.7152 * channels[1]
+            + 0.0722 * channels[2]
+        )
 
 
 if __name__ == "__main__":
