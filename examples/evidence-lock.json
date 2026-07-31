@@ -9,7 +9,7 @@
     ".claude-plugin/plugin.json": "7b4bf16b5f8bd113df7cb702d70749c717e3360b4a792341eacad0879716e55c",
     ".codex-plugin/plugin.json": "8e7946f414e03199002c5b068bfd1668947589964d1abb17b78ad49c47741c9e",
     "skills/htmlify/scripts/formal_html_to_pdf.py": "537bffa7ecae5bd506126364aafdcae88662101d76b9eeff061429419ea47e02",
-    "skills/htmlify/scripts/formal_md_to_html.py": "9298b6c1426df81d954d78f379bdca2584fe11e472fc6b3341d158ccf4a65793",
+    "skills/htmlify/scripts/formal_md_to_html.py": "dd2c7e2a105b57ac22dd42b967d857944b7d8b0ef5bfb04321753bf8ca73a374",
     "skills/htmlify/scripts/formal_render.py": "e3065e8d1c8abbc313472e0d27f58509f6f1e654156d21256d4ae5f03fda1674",
     "examples/README.md": "6e3e029d52cb9b6ab79a70fa6567987db7de5fa7c7f5694d19ad524d9619212a",
     "examples/contrast-audit.json": "ae6d57168b9f80b1a6a0aa8a82955c4f36dad3304bd4e5454d5efaf77e09c4ae",
