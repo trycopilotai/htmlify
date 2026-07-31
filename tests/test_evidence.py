@@ -701,6 +701,51 @@ class EvidenceTest(unittest.TestCase):
             b"IDAT",
             zlib.compress(b"\x00\x00\x00\x00"),
         )
+        suggested_palette = self.png_chunk(
+            b"sPLT",
+            b"palette\0\x08" + b"\x00\x00\x00\xff\x00\x01",
+        )
+        misplaced_suggested_palette = (
+            signature
+            + self.png_chunk(b"IHDR", header)
+            + valid_image_data
+            + suggested_palette
+            + self.png_chunk(b"IEND", b"")
+        )
+        one_bit_indexed_header = (
+            struct.pack(">II", 1, 1)
+            + b"\x01\x03\x00\x00\x00"
+        )
+        indexed_out_of_palette = (
+            signature
+            + self.png_chunk(b"IHDR", one_bit_indexed_header)
+            + self.png_chunk(b"PLTE", b"\x00\x00\x00")
+            + self.png_chunk(
+                b"IDAT",
+                zlib.compress(b"\x00\x80"),
+            )
+            + self.png_chunk(b"IEND", b"")
+        )
+        invalid_icc_profile = (
+            signature
+            + self.png_chunk(b"IHDR", header)
+            + self.png_chunk(
+                b"iCCP",
+                b"profile\0\0" + zlib.compress(b"not-an-icc-profile"),
+            )
+            + valid_image_data
+            + self.png_chunk(b"IEND", b"")
+        )
+        invalid_exif_profile = (
+            signature
+            + self.png_chunk(b"IHDR", header)
+            + self.png_chunk(
+                b"eXIf",
+                b"II\x2a\x00\x00\x00\x00\x00",
+            )
+            + valid_image_data
+            + self.png_chunk(b"IEND", b"")
+        )
         invalid_text_chunks = {
             "text-null": self.png_chunk(
                 b"tEXt",
@@ -731,6 +776,12 @@ class EvidenceTest(unittest.TestCase):
                 histogram_without_palette
             ),
             "invalid-background": invalid_background,
+            "misplaced-suggested-palette": (
+                misplaced_suggested_palette
+            ),
+            "indexed-out-of-palette": indexed_out_of_palette,
+            "invalid-icc-profile": invalid_icc_profile,
+            "invalid-exif-profile": invalid_exif_profile,
             "missing-iend": valid[:-12],
             "trailing-data": valid + b"\x00",
         }
@@ -811,6 +862,11 @@ class EvidenceTest(unittest.TestCase):
             + b"\x01\x01\x00\x01\x01\xff\x00"
             + valid[descriptor:]
         )
+        nonascii_comment = (
+            valid[:19]
+            + b"\x21\xfe\x01\xff\x00"
+            + valid[19:]
+        )
         corruptions = {
             "descriptor": valid[: descriptor + 5],
             "extension": (
@@ -826,6 +882,7 @@ class EvidenceTest(unittest.TestCase):
             "invalid-transparent-index": invalid_transparent_index,
             "invalid-plain-text": invalid_plain_text,
             "nonascii-plain-text": nonascii_plain_text,
+            "nonascii-comment": nonascii_comment,
             "no-frames": screen_with_table + b"\x3b",
             "missing-trailer": valid[:-1],
             "trailing-data": valid + b"\x00",

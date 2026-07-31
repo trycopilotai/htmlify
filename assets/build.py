@@ -417,6 +417,114 @@ def source_fingerprint() -> str:
     return digest.hexdigest()
 
 
+def validate_png_icc_profile(
+    profile: bytes,
+    path: Path,
+) -> None:
+    if len(profile) < 132:
+        raise SystemExit(f"PNG ICC profile is incomplete: {path}")
+    declared_size = struct.unpack(">I", profile[:4])[0]
+    if declared_size != len(profile):
+        raise SystemExit(f"PNG ICC profile size is invalid: {path}")
+    if profile[36:40] != b"acsp":
+        raise SystemExit(f"PNG ICC profile signature is invalid: {path}")
+    if any(profile[100:128]):
+        raise SystemExit(f"PNG ICC profile reserved bytes are set: {path}")
+
+    tag_count = struct.unpack(">I", profile[128:132])[0]
+    table_end = 132 + tag_count * 12
+    if table_end > len(profile):
+        raise SystemExit(f"PNG ICC profile tag table is incomplete: {path}")
+    for index in range(tag_count):
+        record = 132 + index * 12
+        data_offset, data_size = struct.unpack(
+            ">II",
+            profile[record + 4 : record + 12],
+        )
+        if data_offset < table_end or data_offset % 4 != 0:
+            raise SystemExit(f"PNG ICC profile tag offset is invalid: {path}")
+        if data_size < 8 or data_offset + data_size > len(profile):
+            raise SystemExit(f"PNG ICC profile tag size is invalid: {path}")
+        if any(profile[data_offset + 4 : data_offset + 8]):
+            raise SystemExit(
+                f"PNG ICC profile tag reserved bytes are set: {path}"
+            )
+
+
+def validate_png_exif_profile(
+    profile: bytes,
+    path: Path,
+) -> None:
+    if len(profile) < 14:
+        raise SystemExit(f"PNG Exif profile is incomplete: {path}")
+    byte_order = profile[:2]
+    if byte_order == b"II":
+        order = "<"
+    elif byte_order == b"MM":
+        order = ">"
+    else:
+        raise SystemExit(f"PNG Exif byte order is invalid: {path}")
+    if struct.unpack(f"{order}H", profile[2:4])[0] != 42:
+        raise SystemExit(f"PNG Exif signature is invalid: {path}")
+
+    first_ifd = struct.unpack(f"{order}I", profile[4:8])[0]
+    if first_ifd < 8 or first_ifd + 2 > len(profile):
+        raise SystemExit(f"PNG Exif first IFD offset is invalid: {path}")
+    entry_count = struct.unpack(
+        f"{order}H",
+        profile[first_ifd : first_ifd + 2],
+    )[0]
+    entries_start = first_ifd + 2
+    entries_end = entries_start + entry_count * 12
+    if entries_end + 4 > len(profile):
+        raise SystemExit(f"PNG Exif IFD is incomplete: {path}")
+
+    type_sizes = {
+        1: 1,
+        2: 1,
+        3: 2,
+        4: 4,
+        5: 8,
+        6: 1,
+        7: 1,
+        8: 2,
+        9: 4,
+        10: 8,
+        11: 4,
+        12: 8,
+    }
+    for index in range(entry_count):
+        entry = entries_start + index * 12
+        field_type = struct.unpack(
+            f"{order}H",
+            profile[entry + 2 : entry + 4],
+        )[0]
+        component_count = struct.unpack(
+            f"{order}I",
+            profile[entry + 4 : entry + 8],
+        )[0]
+        component_size = type_sizes.get(field_type)
+        if component_size is None or component_count == 0:
+            raise SystemExit(f"PNG Exif IFD entry is invalid: {path}")
+        value_size = component_size * component_count
+        if value_size <= 4:
+            continue
+        value_offset = struct.unpack(
+            f"{order}I",
+            profile[entry + 8 : entry + 12],
+        )[0]
+        if value_offset < 8 or value_offset + value_size > len(profile):
+            raise SystemExit(f"PNG Exif value offset is invalid: {path}")
+
+    next_ifd = struct.unpack(
+        f"{order}I",
+        profile[entries_end : entries_end + 4],
+    )[0]
+    if next_ifd != 0:
+        if next_ifd < 8 or next_ifd + 2 > len(profile):
+            raise SystemExit(f"PNG Exif next IFD offset is invalid: {path}")
+
+
 def png_metadata(path: Path) -> PngMetadata:
     data = path.read_bytes()
     signature = b"\x89PNG\r\n\x1a\n"
@@ -469,6 +577,7 @@ def png_metadata(path: Path) -> PngMetadata:
         b"pHYs",
         b"tRNS",
         b"eXIf",
+        b"sPLT",
     }
     while offset < len(data):
         if offset + 12 > len(data):
@@ -589,6 +698,7 @@ def png_metadata(path: Path) -> PngMetadata:
                 bit_depth,
                 color_type,
                 interlace,
+                palette_entries,
             )
             return PngMetadata(
                 width=width,
@@ -708,11 +818,12 @@ def png_metadata(path: Path) -> PngMetadata:
                     raise SystemExit(
                         f"PNG profile compression is invalid: {path}"
                     )
-                validate_png_zlib_payload(
+                profile = validate_png_zlib_payload(
                     chunk_data[separator + 2 :],
                     path,
                     "profile",
                 )
+                validate_png_icc_profile(profile, path)
             elif chunk_type == b"sBIT":
                 significant_lengths = {
                     0: 1,
@@ -921,15 +1032,7 @@ def png_metadata(path: Path) -> PngMetadata:
                         f"PNG suggested palette length is invalid: {path}"
                     )
             elif chunk_type == b"eXIf":
-                if length < 8:
-                    raise SystemExit(
-                        f"PNG Exif profile is incomplete: {path}"
-                    )
-                byte_order = chunk_data[:4]
-                if byte_order not in (b"II\x2a\0", b"MM\0\x2a"):
-                    raise SystemExit(
-                        f"PNG Exif profile is invalid: {path}"
-                    )
+                validate_png_exif_profile(chunk_data, path)
 
         if seen_idat and chunk_type != b"IDAT":
             idat_finished = True
@@ -957,6 +1060,7 @@ def validate_png_image_data(
     bit_depth: int,
     color_type: int,
     interlace: int,
+    palette_entries: int,
 ) -> None:
     samples_by_color_type = {
         0: 1,
@@ -979,7 +1083,7 @@ def validate_png_image_data(
             (0, 1, 1, 2),
         )
 
-    rows: list[tuple[int, int]] = []
+    rows: list[tuple[int, int, int]] = []
     expected_size = 0
     for start_x, start_y, step_x, step_y in passes:
         pass_width = png_pass_size(width, start_x, step_x)
@@ -987,7 +1091,7 @@ def validate_png_image_data(
         if pass_width == 0 or pass_height == 0:
             continue
         row_bytes = (pass_width * bits_per_pixel + 7) // 8
-        rows.append((pass_height, row_bytes))
+        rows.append((pass_height, pass_width, row_bytes))
         expected_size += pass_height * (row_bytes + 1)
 
     decompressor = zlib.decompressobj()
@@ -1010,11 +1114,83 @@ def validate_png_image_data(
         raise SystemExit(f"PNG scanline byte count is invalid: {path}")
 
     offset = 0
-    for row_count, row_bytes in rows:
+    bytes_per_pixel = max(1, (bits_per_pixel + 7) // 8)
+    for row_count, pass_width, row_bytes in rows:
+        previous = bytes(row_bytes)
         for _row in range(row_count):
-            if decoded[offset] > 4:
+            filter_type = decoded[offset]
+            if filter_type > 4:
                 raise SystemExit(f"PNG scanline filter is invalid: {path}")
+            filtered = decoded[offset + 1 : offset + row_bytes + 1]
+            reconstructed = bytearray(row_bytes)
+            for index, value in enumerate(filtered):
+                left = 0
+                if index >= bytes_per_pixel:
+                    left = reconstructed[index - bytes_per_pixel]
+                above = previous[index]
+                upper_left = 0
+                if index >= bytes_per_pixel:
+                    upper_left = previous[index - bytes_per_pixel]
+                predictor = 0
+                if filter_type == 1:
+                    predictor = left
+                elif filter_type == 2:
+                    predictor = above
+                elif filter_type == 3:
+                    predictor = (left + above) // 2
+                elif filter_type == 4:
+                    predictor = png_paeth_predictor(
+                        left,
+                        above,
+                        upper_left,
+                    )
+                reconstructed[index] = (value + predictor) & 0xFF
+            if color_type == 3:
+                validate_png_palette_indices(
+                    path,
+                    bytes(reconstructed),
+                    pass_width,
+                    bit_depth,
+                    palette_entries,
+                )
+            previous = bytes(reconstructed)
             offset += row_bytes + 1
+
+
+def png_paeth_predictor(
+    left: int,
+    above: int,
+    upper_left: int,
+) -> int:
+    estimate = left + above - upper_left
+    left_distance = abs(estimate - left)
+    above_distance = abs(estimate - above)
+    upper_left_distance = abs(estimate - upper_left)
+    if left_distance <= above_distance:
+        if left_distance <= upper_left_distance:
+            return left
+    if above_distance <= upper_left_distance:
+        return above
+    return upper_left
+
+
+def validate_png_palette_indices(
+    path: Path,
+    scanline: bytes,
+    width: int,
+    bit_depth: int,
+    palette_entries: int,
+) -> None:
+    mask = (1 << bit_depth) - 1
+    for pixel in range(width):
+        bit_offset = pixel * bit_depth
+        byte_offset = bit_offset // 8
+        shift = 8 - bit_depth - bit_offset % 8
+        palette_index = (scanline[byte_offset] >> shift) & mask
+        if palette_index >= palette_entries:
+            raise SystemExit(
+                f"PNG image index exceeds its palette: {path}"
+            )
 
 
 def gif_sub_blocks(
@@ -1381,6 +1557,10 @@ def gif_metadata(path: Path) -> GifMetadata:
                 path,
                 "comment",
             )
+            if any(value < 0x20 or value > 0x7E for value in comment):
+                raise SystemExit(
+                    f"GIF comment contains a nonprintable byte: {path}"
+                )
             comments.append(comment)
             comment_spans.append((block_start, offset))
             continue
