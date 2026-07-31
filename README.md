@@ -112,7 +112,7 @@ rollback_install() {
   fi
 }
 trap rollback_install EXIT
-git clone --quiet --depth 1 --branch v0.2.2 \
+git clone --quiet --depth 1 --branch v0.2.3 \
   https://github.com/trycopilotai/htmlify \
   "$install_tmp/htmlify"
 mkdir -p "$install_stage"
@@ -146,7 +146,7 @@ rollback_install() {
   fi
 }
 trap rollback_install EXIT
-git clone --quiet --depth 1 --branch v0.2.2 \
+git clone --quiet --depth 1 --branch v0.2.3 \
   https://github.com/trycopilotai/htmlify \
   "$install_tmp/htmlify"
 mkdir -p "$install_stage"
@@ -161,7 +161,7 @@ rm -rf "$install_tmp"
 
 Invoke the directly installed skill as `$htmlify`.
 
-The `v0.2.2` repository carries Claude Code and Codex plugin
+The `v0.2.3` repository carries Claude Code and Codex plugin
 manifests. `skill/SKILL.md` resolves to the package both
 runtimes load under `skills/htmlify`, so the skill content
 is stored once.

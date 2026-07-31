@@ -17,7 +17,7 @@ SCRIPTS = ROOT / "skill" / "scripts"
 README = ROOT / "README.md"
 PACKAGE = ROOT / "skills" / "htmlify"
 COMPATIBILITY_PATH = ROOT / "skill"
-RELEASE_VERSION = "0.2.2"
+RELEASE_VERSION = "0.2.3"
 OPENAI_DEFAULT_PROMPT = (
     "Use $htmlify to turn this Markdown into a "
     "source-checked HTML decision surface."
