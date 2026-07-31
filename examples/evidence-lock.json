@@ -35,14 +35,14 @@
     "examples/showcase/design-evolution/rich.html": "00b8ca6ecba44cb0c28c9001ed695f44933bc000d0f2533bc5588c78887cc990",
     "examples/showcase/design-evolution/manifest.json": "b765c7b39e9fc369c02a2aee26207b236f31337f381380331287e5de7602e27f",
     "examples/showcase/design-evolution/run.md": "f7993074323886ce5bf500d539c46004d9dba8f2be44e919d35a8756a11c23f9",
-    "assets/build.py": "9503d03747de02b77dd66ff1a145683067aa7d6f2d5dd26cca1434f00c23f60b",
+    "assets/build.py": "22867a43e6ff93c53b5be5d1b2e34d0c5d6f714967928ef86692308283393518",
     "assets/social-preview.html": "73158de2c043db0a2aa8fa02cd0f8c01dad5e7c65d01a2fcf27c862349b1d382",
-    "assets/publication-sprint.gif": "b86a78bab9d8a19ea0b9294ab2d67093b701b4f4ab841a6c0294d76502f791fe",
-    "assets/publication-sprint-poster.png": "7e2f9b4eb40ec68ace7d20d4d9fc2ba87a5ca2adf335df327801ecd7c91e41d5",
-    "assets/control-plane-status.gif": "00158b1f7fa842a465d84f68a13922f7debf97f804f10e008dfa181f7b69c81f",
-    "assets/control-plane-status-poster.png": "dc0af6e13a797b041ae5ceb8535c4bfbff58e49a368065af9896eb5351f027a4",
-    "assets/design-evolution.gif": "9e2e634a18bbac391a38fc42229699a28d17ff2b90270c5b3470c8e2fae24d7d",
-    "assets/design-evolution-poster.png": "d276582283652ea056cde4d0d1cf672ee9b77fa1ac6ab6471fa538c18c99b46c",
-    "assets/social-preview.png": "a1c7de941b383d4aca7be9411b50a74d733abfb849e4ec82d0f75b889591259b"
+    "assets/publication-sprint.gif": "e49d91bf8fed1a463bc25239241c2859a8d76c63fac25c8f560ce993eade6f6c",
+    "assets/publication-sprint-poster.png": "7ec7ee7664f0be1b1e3de0441296a9e51d9c214947c33458a4fda3a0351d5997",
+    "assets/control-plane-status.gif": "5ade1294a7162eb108a2fbbb50d9e26e30d69001281fccee0e83f98db861dbd3",
+    "assets/control-plane-status-poster.png": "4dd2044eeb063531954dd3392079bf517dc5ea24432c388ef633535fce36c81c",
+    "assets/design-evolution.gif": "6b1e261945414b961a1cc979d6dc6c6b0cee097b61f0d1b54903d85bb216174b",
+    "assets/design-evolution-poster.png": "b3d6c12eaf907e83c975679a4657eeb21773d874ee7c3486a07ef245824c6e62",
+    "assets/social-preview.png": "9f077d8bdf3a8a7c2c571dc49621a1fa05377caa418a790db7d173dbfa59a34a"
   }
 }
