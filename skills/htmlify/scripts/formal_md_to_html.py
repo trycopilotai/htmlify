@@ -233,6 +233,14 @@ def _safe_href(href: str) -> bool:
     return False
 
 
+def _unescape_pipe_backslashes(text: str) -> str:
+    def replace(match: re.Match[str]) -> str:
+        backslashes = match.group(1)
+        return "\\" * (len(backslashes) // 2) + "|"
+
+    return re.sub(r"(\\+)\|", replace, text)
+
+
 def _inline(text: str) -> str:
     codes: list[str] = []
     links: list[str] = []
@@ -242,9 +250,10 @@ def _inline(text: str) -> str:
         return _CODE_SENTINEL.format(len(codes) - 1)
 
     def stash_link(match: re.Match[str]) -> str:
-        label = html.escape(match.group(1), quote=False)
+        label_source = _unescape_pipe_backslashes(match.group(1))
+        label = html.escape(label_source, quote=False)
         label = _apply_emphasis(label)
-        href = match.group(2)
+        href = _unescape_pipe_backslashes(match.group(2))
         if _safe_href(href):
             escaped_href = html.escape(href, quote=True)
             rendered = '<a href="{}">{}</a>'.format(
@@ -258,6 +267,7 @@ def _inline(text: str) -> str:
 
     text = re.sub(r"`([^`]+)`", stash_code, text)
     text = _LINK_RE.sub(stash_link, text)
+    text = _unescape_pipe_backslashes(text)
     text = html.escape(text, quote=False)
     text = _apply_emphasis(text)
 
@@ -311,9 +321,47 @@ def _split_row(line: str) -> list[str]:
     line = line.strip()
     if line.startswith("|"):
         line = line[1:]
+    trailing_pipe_is_escaped = False
     if line.endswith("|"):
-        line = line[:-1]
-    return [cell.strip() for cell in line.split("|")]
+        preceding_backslashes = 0
+        cursor = len(line) - 2
+        while cursor >= 0 and line[cursor] == "\\":
+            preceding_backslashes += 1
+            cursor -= 1
+        trailing_pipe_is_escaped = preceding_backslashes > 0
+    cells: list[str] = []
+    current: list[str] = []
+    index = 0
+    while index < len(line):
+        character = line[index]
+        if character == "\\":
+            run_end = index
+            while run_end < len(line) and line[run_end] == "\\":
+                run_end += 1
+            run_length = run_end - index
+            if run_end < len(line) and line[run_end] == "|":
+                current.extend("\\" * (run_length - 1))
+                current.append("|")
+                index = run_end + 1
+                continue
+            current.extend("\\" * run_length)
+            index = run_end
+            continue
+        if character == "|":
+            cells.append("".join(current).strip())
+            current = []
+            index += 1
+            continue
+        current.append(character)
+        index += 1
+    cells.append("".join(current).strip())
+    if (
+        line.endswith("|")
+        and not trailing_pipe_is_escaped
+        and cells[-1] == ""
+    ):
+        cells.pop()
+    return cells
 
 
 def _alignments(separator: str) -> list[str]:
@@ -335,7 +383,11 @@ def _gather_list(
     index: int,
     count: int,
 ) -> tuple[str, int]:
-    ordered = bool(_OL_RE.match(lines[index].strip()))
+    first_ordered_match = _OL_RE.match(lines[index].strip())
+    ordered = first_ordered_match is not None
+    ordered_start = "1"
+    if first_ordered_match is not None:
+        ordered_start = first_ordered_match.group(1)
     items: list[str] = []
     current: list[str] | None = None
 
@@ -379,13 +431,18 @@ def _gather_list(
         items.append(" ".join(current))
 
     if ordered:
-        tag = "ol"
+        if ordered_start == "1":
+            open_tag = "<ol>"
+        else:
+            open_tag = '<ol start="{}">'.format(ordered_start)
+        close_tag = "</ol>"
     else:
-        tag = "ul"
+        open_tag = "<ul>"
+        close_tag = "</ul>"
     body = "\n".join(
         "<li>{}</li>".format(_inline(item)) for item in items
     )
-    return "<{0}>\n{1}\n</{0}>".format(tag, body), index
+    return "{}\n{}\n{}".format(open_tag, body, close_tag), index
 
 
 def _render_blockquote(lines: list[str]) -> str:
