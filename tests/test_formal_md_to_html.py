@@ -224,7 +224,7 @@ class FormalMarkdownTests(unittest.TestCase):
                 )
                 expected = (
                     'href="https://example.test/a'
-                    + "\\" * ((count - 1) // 2)
+                    + "%5C" * ((count - 1) // 2)
                     + '|b"'
                 )
                 self.assertIn(expected, rendered)
