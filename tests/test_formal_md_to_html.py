@@ -101,6 +101,154 @@ class FormalMarkdownTests(unittest.TestCase):
         self.assertIn('style="text-align:center"', rendered)
         self.assertIn('style="text-align:right"', rendered)
 
+    def test_escaped_pipe_stays_inside_table_cell(self) -> None:
+        rendered = self.renderer.render(
+            "# Table\n\n"
+            "| Expression | Status |\n"
+            "| --- | --- |\n"
+            "| a \\| b | intact |\n"
+        )
+
+        body_row = rendered.split("<tbody>", 1)[1].split(
+            "</tbody>",
+            1,
+        )[0]
+        self.assertEqual(body_row.count("<td"), 2)
+        self.assertIn(">a | b</td>", body_row)
+        self.assertIn(">intact</td>", body_row)
+
+    def test_escaped_trailing_pipe_is_not_a_row_delimiter(
+        self,
+    ) -> None:
+        rendered = self.renderer.render(
+            "# Table\n\n"
+            "| Expression |\n"
+            "| --- |\n"
+            "| a \\|"
+        )
+
+        body_row = rendered.split("<tbody>", 1)[1].split(
+            "</tbody>",
+            1,
+        )[0]
+        self.assertEqual(body_row.count("<td"), 1)
+        self.assertIn(">a |</td>", body_row)
+
+    def test_pipe_escape_preserves_gfm_backslash_runs(
+        self,
+    ) -> None:
+        cases = {
+            r"| a \| b | c |": (["a | b", "c"], "a | b"),
+            r"| a \\| b | c |": (["a \\| b", "c"], "a | b"),
+            r"| a \\\| b | c |": (
+                ["a \\\\| b", "c"],
+                "a \\| b",
+            ),
+            r"| a \\\\| b | c |": (
+                ["a \\\\\\| b", "c"],
+                "a \\| b",
+            ),
+        }
+
+        for source, expectations in cases.items():
+            with self.subTest(source=source):
+                split_expected, rendered_expected = expectations
+                self.assertEqual(
+                    self.renderer._split_row(source),
+                    split_expected,
+                )
+                rendered = self.renderer.render(
+                    "# Table\n\n"
+                    "| Expression | Status |\n"
+                    "| --- | --- |\n"
+                    + source
+                    + "\n"
+                )
+                self.assertIn(
+                    ">" + rendered_expected + "</td>",
+                    rendered,
+                )
+
+    def test_escaped_closing_pipe_preserves_backslash_runs(
+        self,
+    ) -> None:
+        cases = {
+            r"| a \|": ["a |"],
+            r"| a \\|": ["a \\|"],
+            r"| a \\\|": ["a \\\\|"],
+            r"| a \\\\|": ["a \\\\\\|"],
+        }
+
+        for source, expected in cases.items():
+            with self.subTest(source=source):
+                self.assertEqual(
+                    self.renderer._split_row(source),
+                    expected,
+                )
+
+    def test_code_span_keeps_non_escape_backslashes(self) -> None:
+        for count in range(1, 5):
+            with self.subTest(count=count):
+                row = "| `a " + "\\" * count + "| b` | c |"
+                rendered = self.renderer.render(
+                    "# Table\n\n"
+                    "| Expression | Status |\n"
+                    "| --- | --- |\n"
+                    + row
+                    + "\n"
+                )
+                expected = (
+                    "<code>a "
+                    + "\\" * (count - 1)
+                    + "| b</code>"
+                )
+                self.assertIn(expected, rendered)
+
+    def test_link_destination_normalizes_pipe_backslashes(
+        self,
+    ) -> None:
+        for count in range(1, 5):
+            with self.subTest(count=count):
+                destination = (
+                    "https://example.test/a"
+                    + "\\" * count
+                    + "|b"
+                )
+                row = "| [x](" + destination + ") | c |"
+                rendered = self.renderer.render(
+                    "# Table\n\n"
+                    "| Expression | Status |\n"
+                    "| --- | --- |\n"
+                    + row
+                    + "\n"
+                )
+                expected = (
+                    'href="https://example.test/a'
+                    + "\\" * ((count - 1) // 2)
+                    + '|b"'
+                )
+                self.assertIn(expected, rendered)
+
+    def test_ordered_list_preserves_non_one_start(self) -> None:
+        rendered = self.renderer.render(
+            "# Sequence\n\n"
+            "3. Third\n"
+            "4. Fourth\n"
+        )
+
+        self.assertIn('<ol start="3">', rendered)
+        self.assertIn("<li>Third</li>", rendered)
+        self.assertIn("<li>Fourth</li>", rendered)
+
+    def test_large_ordered_list_start_does_not_raise(self) -> None:
+        marker = "9" * 5000
+        rendered = self.renderer.render(
+            "# Sequence\n\n" + marker + ". Item\n"
+        )
+
+        self.assertIn('<ol start="' + marker + '">', rendered)
+        self.assertIn("<li>Item</li>", rendered)
+
     def test_default_output_removes_markdown_suffix(self) -> None:
         cases = {
             "brief.md": "brief.html",
