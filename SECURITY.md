@@ -6,10 +6,15 @@ Security fixes apply to the latest tagged release.
 
 ## Reporting a vulnerability
 
-Use GitHub private vulnerability reporting for this
-repository. Do not open a public issue for a credential,
-private-data disclosure, unsafe link, command-execution
-path, or local-file exposure.
+While the repository is private, authorized collaborators
+should open a draft repository security advisory through
+**Security** → **Advisories** → **New draft security
+advisory**. After the repository is public, use **Security**
+→ **Report a vulnerability**.
+
+Do not open a public issue for a credential, private-data
+disclosure, unsafe link, command-execution path, or
+local-file exposure.
 
 Include the affected tag, the smallest reproducer that does
 not contain private data, and the observed backend.
@@ -38,7 +43,10 @@ sharing an artifact.
 
 ## Release controls
 
-Every release is scanned before its first remote push.
-Release checks cover tracked paths, contents, commit
-messages, identities, branches, and tags. The supported tag
-must point into the reviewed history.
+`make check` verifies the tracked package, evidence, and
+generated-media contracts. The release procedure separately
+audits full-history paths and contents, commit messages,
+author and committer identities, branches, and every tag
+before a remote push. `make check` does not replace that
+disclosure review. The supported tag must point into the
+reviewed history.

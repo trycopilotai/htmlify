@@ -26,13 +26,21 @@ The Python suites need Python 3.11 or later:
 make compile test
 ```
 
-The complete offline check also needs Chrome or Chromium and
-ImageMagick. It rebuilds the screenshots and animations in
-an isolated directory, then verifies their dimensions and
-timing:
+The complete offline check validates the committed
+screenshots and animations, including their source
+fingerprints, dimensions, timing, and loop metadata. It does
+not rebuild them and does not require a browser or
+ImageMagick:
 
 ```sh
 make check
+```
+
+Rebuilding the screenshots and animations requires Chrome
+or Chromium and ImageMagick:
+
+```sh
+make assets
 ```
 
 Add a focused test for every behavior change. A renderer

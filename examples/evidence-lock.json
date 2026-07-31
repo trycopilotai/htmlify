@@ -1,11 +1,11 @@
 {
   "files": {
     "README.md": "f42448f72c3701ae63a6198b30c350da16a984b6337d7be282a3c91b70867cdf",
-    "CONTRIBUTING.md": "8c296a84b8b3c277c43004705f49a2c188f7ee22fa5e9d7c679a957bfa7118cb",
-    "SECURITY.md": "bbd2a1316c46b1fe6b338ec651f0a066b2a26aac31de95a44ca6308e16c8be4f",
+    "CONTRIBUTING.md": "1af9e1191fceae209919c081d7c7231f7bbb210887897b2cffe1aff0b8a41d42",
+    "SECURITY.md": "0078157a26c3def33b8d82fca8251fdf077f9d1f08b8fb6e57e2d6ea54926f14",
     "LICENSE": "a2d0cb3e05de7076e42008eaf368cbac2bc0ed88e226f4ffc019bdd7dd5b7d90",
-    "skill/SKILL.md": "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded9704aaaf0d8185d64c8a7",
-    "skill/agents/openai.yaml": "243d8863353d2896a2e2a78ca5baa9c31113f02fb671d13c8de7401f243e6b26",
+    "skills/htmlify/SKILL.md": "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded9704aaaf0d8185d64c8a7",
+    "skills/htmlify/agents/openai.yaml": "243d8863353d2896a2e2a78ca5baa9c31113f02fb671d13c8de7401f243e6b26",
     ".claude-plugin/plugin.json": "70ed1498be7385cfac60d146fb44f94083c49e5b2e82e019aa11842061c306fb",
     ".codex-plugin/plugin.json": "628378d0a1847e4c68a8d20a107008e4ef6632613fd0485ee961533b80cf1f3b",
     "examples/README.md": "6e3e029d52cb9b6ab79a70fa6567987db7de5fa7c7f5694d19ad524d9619212a",

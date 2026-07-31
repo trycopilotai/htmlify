@@ -937,9 +937,27 @@ class EvidenceTest(unittest.TestCase):
             EXAMPLES / "evidence-lock.json"
         )
         for relative_path, expected in lock["files"].items():
-            actual = sha256(ROOT / relative_path)
+            index = subprocess.run(
+                ["git", "ls-files", "-s", "--", relative_path],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            fields = index.stdout.split()
+            self.assertGreaterEqual(
+                len(fields),
+                4,
+                relative_path,
+            )
+            self.assertIn(
+                fields[0],
+                {"100644", "100755"},
+                relative_path,
+            )
+            worktree_actual = sha256(ROOT / relative_path)
             self.assertEqual(
-                actual,
+                worktree_actual,
                 expected,
                 relative_path,
             )
