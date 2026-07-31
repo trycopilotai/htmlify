@@ -2,7 +2,7 @@
   "files": {
     "README.md": "f42448f72c3701ae63a6198b30c350da16a984b6337d7be282a3c91b70867cdf",
     "CONTRIBUTING.md": "1af9e1191fceae209919c081d7c7231f7bbb210887897b2cffe1aff0b8a41d42",
-    "SECURITY.md": "0078157a26c3def33b8d82fca8251fdf077f9d1f08b8fb6e57e2d6ea54926f14",
+    "SECURITY.md": "5c1a28800389265a76df9b2c9d074cfa485411daaed8e9bfb1a97b7be9d88358",
     "LICENSE": "a2d0cb3e05de7076e42008eaf368cbac2bc0ed88e226f4ffc019bdd7dd5b7d90",
     "skills/htmlify/SKILL.md": "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded9704aaaf0d8185d64c8a7",
     "skills/htmlify/agents/openai.yaml": "243d8863353d2896a2e2a78ca5baa9c31113f02fb671d13c8de7401f243e6b26",
