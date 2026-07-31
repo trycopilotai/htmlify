@@ -962,6 +962,21 @@ class EvidenceTest(unittest.TestCase):
                 relative_path,
             )
 
+    def test_evidence_lock_covers_installed_runtime(self) -> None:
+        lock = read_json(EXAMPLES / "evidence-lock.json")
+        expected = {
+            ".claude-plugin/plugin.json",
+            ".codex-plugin/plugin.json",
+            "README.md",
+            "skills/htmlify/SKILL.md",
+            "skills/htmlify/agents/openai.yaml",
+            "skills/htmlify/scripts/formal_html_to_pdf.py",
+            "skills/htmlify/scripts/formal_md_to_html.py",
+            "skills/htmlify/scripts/formal_render.py",
+        }
+
+        self.assertTrue(expected.issubset(lock["files"]))
+
     def test_documented_install_is_complete(self) -> None:
         result = subprocess.run(
             [
