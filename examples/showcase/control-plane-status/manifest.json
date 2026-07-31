@@ -1,6 +1,8 @@
 {
   "mode": "curated",
   "input_commit": "e3d5173",
+  "historical_input_path": "examples/showcase/control-plane-status/source.gpt.md",
+  "historical_output_path": "examples/showcase/control-plane-status/rich.gpt.html",
   "skill_sha256": "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded9704aaaf0d8185d64c8a7",
   "agent": "OpenAI Codex",
   "agent_version": "codex-cli 0.146.0",
@@ -24,9 +26,9 @@
     "result": "passed"
   },
   "files": {
-    "examples/showcase/control-plane-status/source.gpt.md": "a969efef85dcf38a2786a191e202b585beb39266a44c65d5a98ce9e52a1d0665",
-    "examples/showcase/control-plane-status/formal.gpt.html": "3c36a939909efc2ce8775855f62af3cf0fc5d266d78357d041a96de2230b794a",
-    "examples/showcase/control-plane-status/rich.gpt.html": "2fbc002f12120af6602858031c354ec340f8a26fb794122e01ff9ae99f181142",
-    "examples/showcase/control-plane-status/run.gpt.md": "86aeb847a030fecc7cbf3c6519ff6606b4fc3b46f009ce79512fd5c8b3bd8cf4"
+    "examples/showcase/control-plane-status/source.md": "a969efef85dcf38a2786a191e202b585beb39266a44c65d5a98ce9e52a1d0665",
+    "examples/showcase/control-plane-status/formal.html": "3c36a939909efc2ce8775855f62af3cf0fc5d266d78357d041a96de2230b794a",
+    "examples/showcase/control-plane-status/rich.html": "2fbc002f12120af6602858031c354ec340f8a26fb794122e01ff9ae99f181142",
+    "examples/showcase/control-plane-status/run.md": "86aeb847a030fecc7cbf3c6519ff6606b4fc3b46f009ce79512fd5c8b3bd8cf4"
   }
 }

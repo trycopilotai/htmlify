@@ -1,6 +1,7 @@
 {
   "mode": "curated",
   "input_commit": "7a074c7",
+  "historical_input_path": "examples/curated/release-readiness.gpt.md",
   "skill_sha256": "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded9704aaaf0d8185d64c8a7",
   "agent": "OpenAI Codex",
   "agent_version": "codex-cli 0.146.0",
@@ -30,8 +31,8 @@
     "result": "passed"
   },
   "files": {
-    "examples/curated/release-readiness.gpt.md": "aa3d32f74e85e95d1d2f4cd7a151001451d773c90f0c71cd251ce072745acbe7",
-    "examples/curated/index.html": "f0a8630ef1a40461fa3baa548f9301f9e78d7049fc1b33e191389f780b7405b4",
-    "examples/curated/run.gpt.md": "2cee95629b9663020136e29a371bcc1822cf9d9ada415f28ceb399f8adb1be44"
+    "examples/curated/release-readiness.md": "aa3d32f74e85e95d1d2f4cd7a151001451d773c90f0c71cd251ce072745acbe7",
+    "examples/curated/index.html": "1796d052a163caceb8a3c10c33c9572b390d98f85128adf2e24a85501fae09e6",
+    "examples/curated/run.md": "2cee95629b9663020136e29a371bcc1822cf9d9ada415f28ceb399f8adb1be44"
   }
 }

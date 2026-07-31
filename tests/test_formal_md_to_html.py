@@ -104,8 +104,8 @@ class FormalMarkdownTests(unittest.TestCase):
     def test_default_output_removes_markdown_suffix(self) -> None:
         cases = {
             "brief.md": "brief.html",
-            "brief.markdown": "brief.html",
             "brief.gpt.md": "brief.html",
+            "brief.markdown": "brief.html",
             "brief.txt": "brief.html",
         }
 

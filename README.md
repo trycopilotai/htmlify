@@ -30,19 +30,19 @@ beats.
 A dated plan becomes a printable brief, then a timeline with
 phase state, near-term agenda, and submission gates.
 
-[Source Markdown](examples/showcase/publication-sprint/source.gpt.md)
+[Source Markdown](examples/showcase/publication-sprint/source.md)
 →
-[formal HTML](examples/showcase/publication-sprint/formal.gpt.html)
+[formal HTML](examples/showcase/publication-sprint/formal.html)
 →
-[rich HTML](examples/showcase/publication-sprint/rich.gpt.html)
+[rich HTML](examples/showcase/publication-sprint/rich.html)
 
 <picture>
   <source
     media="(prefers-reduced-motion: reduce)"
-    srcset="assets/publication-sprint-poster.gpt.png"
+    srcset="assets/publication-sprint-poster.png"
   >
   <img
-    src="assets/publication-sprint.gpt.gif"
+    src="assets/publication-sprint.gif"
     alt="A publication sprint moving from source Markdown to formal HTML to a rich timeline"
   >
 </picture>
@@ -53,19 +53,19 @@ A release status note becomes a printable system record,
 then a control-path view with boundaries, evidence, and the
 remaining hold.
 
-[Source Markdown](examples/showcase/control-plane-status/source.gpt.md)
+[Source Markdown](examples/showcase/control-plane-status/source.md)
 →
-[formal HTML](examples/showcase/control-plane-status/formal.gpt.html)
+[formal HTML](examples/showcase/control-plane-status/formal.html)
 →
-[rich HTML](examples/showcase/control-plane-status/rich.gpt.html)
+[rich HTML](examples/showcase/control-plane-status/rich.html)
 
 <picture>
   <source
     media="(prefers-reduced-motion: reduce)"
-    srcset="assets/control-plane-status-poster.gpt.png"
+    srcset="assets/control-plane-status-poster.png"
   >
   <img
-    src="assets/control-plane-status.gpt.gif"
+    src="assets/control-plane-status.gif"
     alt="A control-plane status note moving from source Markdown to formal HTML to a rich system view"
   >
 </picture>
@@ -75,19 +75,18 @@ remaining hold.
 A compact evidence review becomes a formal study, then a
 visual progression across three retained design checkpoints.
 
-[Source Markdown](examples/showcase/design-evolution/source.gpt.md)
+[Source Markdown](examples/showcase/design-evolution/source.md)
 →
-[formal HTML](examples/showcase/design-evolution/formal.gpt.html)
-→
-[rich HTML](examples/showcase/design-evolution/rich.gpt.html)
+[formal HTML](examples/showcase/design-evolution/formal.html)
+→ [rich HTML](examples/showcase/design-evolution/rich.html)
 
 <picture>
   <source
     media="(prefers-reduced-motion: reduce)"
-    srcset="assets/design-evolution-poster.gpt.png"
+    srcset="assets/design-evolution-poster.png"
   >
   <img
-    src="assets/design-evolution.gpt.gif"
+    src="assets/design-evolution.gif"
     alt="A typography study moving from source Markdown to formal HTML to a rich visual progression"
   >
 </picture>
@@ -113,7 +112,7 @@ rollback_install() {
   fi
 }
 trap rollback_install EXIT
-git clone --quiet --depth 1 --branch v0.2.1 \
+git clone --quiet --depth 1 --branch v0.2.2 \
   https://github.com/trycopilotai/htmlify \
   "$install_tmp/htmlify"
 mkdir -p "$install_stage"
@@ -147,7 +146,7 @@ rollback_install() {
   fi
 }
 trap rollback_install EXIT
-git clone --quiet --depth 1 --branch v0.2.1 \
+git clone --quiet --depth 1 --branch v0.2.2 \
   https://github.com/trycopilotai/htmlify \
   "$install_tmp/htmlify"
 mkdir -p "$install_stage"
@@ -162,7 +161,7 @@ rm -rf "$install_tmp"
 
 Invoke the directly installed skill as `$htmlify`.
 
-The `v0.2.1` repository carries Claude Code and Codex plugin
+The `v0.2.2` repository carries Claude Code and Codex plugin
 manifests. `skill/SKILL.md` resolves to the package both
 runtimes load under `skills/htmlify`, so the skill content
 is stored once.
@@ -224,12 +223,15 @@ manifests drift.
 The three synthetic showcases commit their source, formal
 HTML, rich HTML, final run record, and manifest together.
 `make assets` rebuilds each three-frame animation in that
-order. `make check` regenerates the assets in an isolated
-directory and verifies their dimensions and timing. The
-machine-readable contrast audit records the text and color
-pairs checked during release QA. Tests recompute every
-declared ratio, fail below 4.5:1, and confirm the recorded
-color tokens remain in the relevant source document.
+order. Each generated asset embeds a SHA-256 fingerprint of
+the generator and its Markdown and HTML inputs. `make check`
+verifies that fingerprint, dimensions, frame count, timing,
+and infinite loop without depending on host-specific browser
+or font rasterization. The machine-readable contrast audit
+records the text and color pairs checked during release QA.
+Tests recompute every declared ratio, fail below 4.5:1, and
+confirm the recorded color tokens remain in the relevant
+source document.
 
 See [the evidence summary](examples/README.md).
 

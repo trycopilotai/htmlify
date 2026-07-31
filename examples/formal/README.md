@@ -3,10 +3,10 @@
 This example passes a fictional delivery brief through the
 bundled formal renderer.
 
-- [Source Markdown](delivery-brief.gpt.md)
+- [Source Markdown](delivery-brief.md)
 - [Rendered HTML](delivery-brief.html)
 - [Rendered PDF](delivery-brief.pdf)
-- [Evidence manifest](manifest.gpt.json)
+- [Evidence manifest](manifest.json)
 
 The live run selected Google Chrome 150.0.7871.187 and
 produced a non-empty, single-page US Letter PDF. The page

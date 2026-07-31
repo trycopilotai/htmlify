@@ -1,7 +1,7 @@
 {
   "minimum_ratio": 4.5,
   "documents": {
-    "assets/build.gpt.py": [
+    "assets/build.py": [
       {
         "label": "source title",
         "foreground": "#ffffff",
@@ -28,7 +28,7 @@
         "background": "#171a21"
       }
     ],
-    "assets/social-preview.gpt.html": [
+    "assets/social-preview.html": [
       {
         "label": "primary text",
         "foreground": "#f8fafc",
@@ -127,7 +127,7 @@
         "background": "#fffdf8"
       }
     ],
-    "examples/showcase/publication-sprint/rich.gpt.html": [
+    "examples/showcase/publication-sprint/rich.html": [
       {
         "label": "body text",
         "foreground": "#18212b",
@@ -208,7 +208,7 @@
         "background": "#fbe9df"
       }
     ],
-    "examples/showcase/control-plane-status/rich.gpt.html": [
+    "examples/showcase/control-plane-status/rich.html": [
       {
         "label": "primary text",
         "foreground": "#f5f7fb",
@@ -245,7 +245,7 @@
         "background": "#4a3512"
       }
     ],
-    "examples/showcase/design-evolution/rich.gpt.html": [
+    "examples/showcase/design-evolution/rich.html": [
       {
         "label": "body text",
         "foreground": "#17221f",

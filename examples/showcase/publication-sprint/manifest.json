@@ -1,6 +1,8 @@
 {
   "mode": "curated",
   "input_commit": "e3d5173",
+  "historical_input_path": "examples/showcase/publication-sprint/source.gpt.md",
+  "historical_output_path": "examples/showcase/publication-sprint/rich.gpt.html",
   "skill_sha256": "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded9704aaaf0d8185d64c8a7",
   "agent": "OpenAI Codex",
   "agent_version": "codex-cli 0.146.0",
@@ -24,9 +26,9 @@
     "result": "passed"
   },
   "files": {
-    "examples/showcase/publication-sprint/source.gpt.md": "01810a25a0c5040aa17b07c94428b6b35616dae58a35f40bc8faac0a1749ffb6",
-    "examples/showcase/publication-sprint/formal.gpt.html": "18a8c07ac4563d2fb5c49cf0119a598abd729141d5856dcb1f97a87d8f90c2c6",
-    "examples/showcase/publication-sprint/rich.gpt.html": "faa003efedc2e72dab460ae018bb132dc204fc5964320bc21384c5427b269f1d",
-    "examples/showcase/publication-sprint/run.gpt.md": "95367a8ced705e166bb0bc5cd2550c128be220480e3837464923756c3578a63d"
+    "examples/showcase/publication-sprint/source.md": "01810a25a0c5040aa17b07c94428b6b35616dae58a35f40bc8faac0a1749ffb6",
+    "examples/showcase/publication-sprint/formal.html": "18a8c07ac4563d2fb5c49cf0119a598abd729141d5856dcb1f97a87d8f90c2c6",
+    "examples/showcase/publication-sprint/rich.html": "3cf8898c25966aad0e375a051d700d04d04b06d234b2caa3b8097699f0781f56",
+    "examples/showcase/publication-sprint/run.md": "95367a8ced705e166bb0bc5cd2550c128be220480e3837464923756c3578a63d"
   }
 }

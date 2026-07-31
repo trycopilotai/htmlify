@@ -1,6 +1,6 @@
 {
   "name": "htmlify",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Turn dense Markdown into source-checked HTML timelines, decision surfaces, system explainers, visual progressions, evidence reviews, or deterministic formal HTML with optional PDF export.",
   "author": {
     "name": "trycopilot.ai"
@@ -22,11 +22,7 @@
     "longDescription": "Render Markdown as deterministic formal HTML or build a source-checked visual decision surface.",
     "developerName": "trycopilot.ai",
     "category": "Developer Tools",
-    "capabilities": [
-      "Interactive",
-      "Write",
-      "Execute"
-    ],
+    "capabilities": ["Interactive", "Write", "Execute"],
     "websiteURL": "https://github.com/trycopilotai/htmlify",
     "defaultPrompt": [
       "Use $htmlify to turn this Markdown into a source-checked HTML decision surface."

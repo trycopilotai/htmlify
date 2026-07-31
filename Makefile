@@ -4,15 +4,15 @@ compile:
 	@python3 -m compileall -q skill/scripts tests
 
 test:
-	@set -e; for test_file in tests/test*.gpt.py; do \
+	@set -e; for test_file in tests/test*.py; do \
 	  python3 "$$test_file"; \
 	done
 
 assets:
-	@python3 assets/build.gpt.py
+	@python3 assets/build.py
 
 assets-check:
-	@python3 assets/build.gpt.py --check
+	@python3 assets/build.py --check
 
 check: compile test assets-check
 

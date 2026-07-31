@@ -6,6 +6,7 @@ import struct
 import subprocess
 import tempfile
 import unittest
+import zlib
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -13,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLES = ROOT / "examples"
 ASSETS = ROOT / "assets"
-BUILD_SCRIPT = ASSETS / "build.gpt.py"
+BUILD_SCRIPT = ASSETS / "build.py"
 SHOWCASE_SLUGS = (
     "publication-sprint",
     "control-plane-status",
@@ -72,7 +73,7 @@ class EvidenceTest(unittest.TestCase):
     def test_example_manifests_match_files(self) -> None:
         for mode in ("curated", "formal"):
             manifest_path = (
-                EXAMPLES / mode / "manifest.gpt.json"
+                EXAMPLES / mode / "manifest.json"
             )
             manifest_text = manifest_path.read_text(
                 encoding="utf-8"
@@ -102,7 +103,7 @@ class EvidenceTest(unittest.TestCase):
             if mode == "curated":
                 source_relative = (
                     "examples/curated/"
-                    "release-readiness.gpt.md"
+                    "release-readiness.md"
                 )
                 self.assertEqual(
                     manifest["run_record"],
@@ -126,12 +127,12 @@ class EvidenceTest(unittest.TestCase):
                 )
             else:
                 source_relative = (
-                    "examples/formal/delivery-brief.gpt.md"
+                    "examples/formal/delivery-brief.md"
                 )
             self.assertEqual(
                 git_blob(
                     manifest["input_commit"],
-                    source_relative,
+                    manifest["historical_input_path"],
                 ),
                 (ROOT / source_relative).read_bytes(),
                 source_relative,
@@ -151,10 +152,10 @@ class EvidenceTest(unittest.TestCase):
         for slug in SHOWCASE_SLUGS:
             showcase = EXAMPLES / "showcase" / slug
             manifest = read_json(
-                showcase / "manifest.gpt.json"
+                showcase / "manifest.json"
             )
             manifest_text = (
-                showcase / "manifest.gpt.json"
+                showcase / "manifest.json"
             ).read_text(encoding="utf-8")
             self.assertNotRegex(
                 manifest_text,
@@ -169,7 +170,7 @@ class EvidenceTest(unittest.TestCase):
                 1,
             )
             transcript = (
-                showcase / "run.gpt.md"
+                showcase / "run.md"
             ).read_text(encoding="utf-8")
 
             self.assertEqual(manifest["mode"], "curated")
@@ -186,12 +187,12 @@ class EvidenceTest(unittest.TestCase):
                 "codex-cli 0.146.0",
             )
             source_relative = (
-                f"examples/showcase/{slug}/source.gpt.md"
+                f"examples/showcase/{slug}/source.md"
             )
             self.assertEqual(
                 git_blob(
                     manifest["input_commit"],
-                    source_relative,
+                    manifest["historical_input_path"],
                 ),
                 (ROOT / source_relative).read_bytes(),
                 source_relative,
@@ -217,7 +218,7 @@ class EvidenceTest(unittest.TestCase):
                 "passed",
             )
             self.assertIn(
-                f"examples/showcase/{slug}/rich.gpt.html",
+                manifest["historical_output_path"],
                 transcript,
             )
             self.assertNotIn("/Users/", transcript)
@@ -236,21 +237,24 @@ class EvidenceTest(unittest.TestCase):
         self,
     ) -> None:
         manifest = read_json(
-            EXAMPLES / "formal" / "manifest.gpt.json"
+            EXAMPLES / "formal" / "manifest.json"
         )
         self.assertEqual(manifest["pdf_backend"], "chrome")
         self.assertEqual(manifest["pdf_pages"], 1)
         self.assertFalse(manifest["output_edited"])
 
-    def test_curated_transcript_names_public_paths(
+    def test_curated_transcript_preserves_historical_paths(
         self,
     ) -> None:
+        manifest = read_json(
+            EXAMPLES / "curated" / "manifest.json"
+        )
         transcript = (
-            EXAMPLES / "curated" / "run.gpt.md"
+            EXAMPLES / "curated" / "run.md"
         ).read_text(encoding="utf-8")
         self.assertIn("**Mode:** Curated", transcript)
         self.assertIn(
-            "examples/curated/release-readiness.gpt.md",
+            manifest["historical_input_path"],
             transcript,
         )
         self.assertIn("examples/curated/index.html", transcript)
@@ -260,38 +264,49 @@ class EvidenceTest(unittest.TestCase):
     def test_launch_assets_have_expected_dimensions(
         self,
     ) -> None:
+        specification = importlib.util.spec_from_file_location(
+            "htmlify_asset_builder_committed_media",
+            BUILD_SCRIPT,
+        )
+        if specification is None:
+            self.fail("Could not load the asset builder")
+        if specification.loader is None:
+            self.fail("Asset builder has no loader")
+        builder = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(builder)
+
         expected_media = {
             "social-preview.png",
         }
         self.assertEqual(
-            self.png_dimensions(
+            builder.png_dimensions(
                 ASSETS / "social-preview.png"
             ),
             (1280, 640),
         )
         for slug in SHOWCASE_SLUGS:
-            poster = ASSETS / f"{slug}-poster.gpt.png"
-            animation = ASSETS / f"{slug}.gpt.gif"
+            poster = ASSETS / f"{slug}-poster.png"
+            animation = ASSETS / f"{slug}.gif"
             expected_media.add(poster.name)
             expected_media.add(animation.name)
             self.assertEqual(
-                self.png_dimensions(poster),
+                builder.png_dimensions(poster),
                 (1280, 720),
             )
             self.assertEqual(
-                self.gif_dimensions(animation),
+                builder.gif_dimensions(animation),
                 (1280, 720),
             )
+            metadata = builder.gif_metadata(animation)
             self.assertEqual(
-                animation.read_bytes().count(
-                    b"\x21\xf9\x04"
-                ),
+                metadata.frame_count,
                 3,
             )
             self.assertEqual(
-                self.gif_delays(animation),
-                [100, 100, 200],
+                metadata.delays,
+                (100, 100, 200),
             )
+            self.assertTrue(metadata.loops_forever)
 
         actual_media = {
             path.name
@@ -300,15 +315,37 @@ class EvidenceTest(unittest.TestCase):
         }
         self.assertEqual(actual_media, expected_media)
 
+    def test_reader_visible_source_paths_are_current(self) -> None:
+        curated = (
+            EXAMPLES / "curated" / "index.html"
+        ).read_text(encoding="utf-8")
+        publication = (
+            EXAMPLES
+            / "showcase"
+            / "publication-sprint"
+            / "rich.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "examples/curated/release-readiness.md",
+            curated,
+        )
+        self.assertNotIn("release-readiness.gpt.md", curated)
+        self.assertIn(
+            "Curated from <strong>source.md</strong>",
+            publication,
+        )
+        self.assertNotIn("source.gpt.md", publication)
+
     def test_showcases_have_three_committed_states(
         self,
     ) -> None:
         expected = {
-            "source.gpt.md",
-            "formal.gpt.html",
-            "rich.gpt.html",
-            "manifest.gpt.json",
-            "run.gpt.md",
+            "source.md",
+            "formal.html",
+            "rich.html",
+            "manifest.json",
+            "run.md",
         }
         for slug in SHOWCASE_SLUGS:
             showcase = EXAMPLES / "showcase" / slug
@@ -320,13 +357,13 @@ class EvidenceTest(unittest.TestCase):
             self.assertEqual(actual, expected)
 
             source = (
-                showcase / "source.gpt.md"
+                showcase / "source.md"
             ).read_text(encoding="utf-8")
             formal = (
-                showcase / "formal.gpt.html"
+                showcase / "formal.html"
             ).read_text(encoding="utf-8")
             rich = (
-                showcase / "rich.gpt.html"
+                showcase / "rich.html"
             ).read_text(encoding="utf-8")
             self.assertIn("synthetic example", source.lower())
             self.assertIn("<html", formal.lower())
@@ -336,7 +373,7 @@ class EvidenceTest(unittest.TestCase):
         self,
     ) -> None:
         audit = read_json(
-            EXAMPLES / "contrast-audit.gpt.json"
+            EXAMPLES / "contrast-audit.json"
         )
         minimum = audit["minimum_ratio"]
         for relative_path, pairs in audit[
@@ -382,7 +419,7 @@ class EvidenceTest(unittest.TestCase):
                 EXAMPLES
                 / "showcase"
                 / slug
-                / "rich.gpt.html"
+                / "rich.html"
             )
 
         for path in paths:
@@ -411,7 +448,7 @@ class EvidenceTest(unittest.TestCase):
                     [
                         "python3",
                         str(renderer),
-                        str(showcase / "source.gpt.md"),
+                        str(showcase / "source.md"),
                         "--output",
                         str(generated),
                     ],
@@ -421,7 +458,7 @@ class EvidenceTest(unittest.TestCase):
                 )
                 self.assertEqual(
                     generated.read_bytes(),
-                    (showcase / "formal.gpt.html").read_bytes(),
+                    (showcase / "formal.html").read_bytes(),
                     slug,
                 )
 
@@ -432,7 +469,7 @@ class EvidenceTest(unittest.TestCase):
             EXAMPLES
             / "showcase"
             / "publication-sprint"
-            / "rich.gpt.html"
+            / "rich.html"
         ).read_text(encoding="utf-8")
         self.assertIn("Begin full narrative", publication)
         self.assertIn(
@@ -455,7 +492,7 @@ class EvidenceTest(unittest.TestCase):
             EXAMPLES
             / "showcase"
             / "control-plane-status"
-            / "rich.gpt.html"
+            / "rich.html"
         ).read_text(encoding="utf-8")
         self.assertIn(
             "Restart the service with the matching digest.",
@@ -466,7 +503,7 @@ class EvidenceTest(unittest.TestCase):
             EXAMPLES
             / "showcase"
             / "design-evolution"
-            / "rich.gpt.html"
+            / "rich.html"
         ).read_text(encoding="utf-8")
         for size in ("12 px", "16 px", "32 px"):
             self.assertIn(size, design)
@@ -575,20 +612,272 @@ class EvidenceTest(unittest.TestCase):
             )
             for slug in SHOWCASE_SLUGS:
                 (
-                    output_root / f"{slug}-poster.gpt.png"
+                    output_root / f"{slug}-poster.png"
                 ).write_bytes(self.png_header(1280, 720))
                 (
-                    output_root / f"{slug}.gpt.gif"
+                    output_root / f"{slug}.gif"
                 ).write_bytes(self.gif_header(1280, 720))
 
             with self.assertRaises(SystemExit):
                 builder.validate_assets(output_root)
 
+    def test_png_parser_rejects_corrupt_chunks_crc_and_iend(
+        self,
+    ) -> None:
+        specification = importlib.util.spec_from_file_location(
+            "htmlify_asset_builder_corrupt_png",
+            BUILD_SCRIPT,
+        )
+        if specification is None:
+            self.fail("Could not load the asset builder")
+        if specification.loader is None:
+            self.fail("Asset builder has no loader")
+
+        builder = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(builder)
+        valid = self.minimal_png(1, 1)
+        corrupt_crc = bytearray(valid)
+        corrupt_crc[29] ^= 1
+        header = (
+            struct.pack(">II", 1, 1)
+            + b"\x08\x02\x00\x00\x00"
+        )
+        signature = b"\x89PNG\r\n\x1a\n"
+        invalid_idat = (
+            signature
+            + self.png_chunk(b"IHDR", header)
+            + self.png_chunk(b"IDAT", b"not-zlib")
+            + self.png_chunk(b"IEND", b"")
+        )
+        misordered_transparency = (
+            signature
+            + self.png_chunk(b"IHDR", header)
+            + self.png_chunk(
+                b"IDAT",
+                zlib.compress(b"\x00\x00\x00\x00"),
+            )
+            + self.png_chunk(b"tRNS", b"\x00" * 6)
+            + self.png_chunk(b"IEND", b"")
+        )
+        indexed_header = (
+            struct.pack(">II", 1, 1)
+            + b"\x08\x03\x00\x00\x00"
+        )
+        background_before_palette = (
+            signature
+            + self.png_chunk(b"IHDR", indexed_header)
+            + self.png_chunk(b"bKGD", b"\x00")
+            + self.png_chunk(
+                b"PLTE",
+                b"\x00\x00\x00\xff\xff\xff",
+            )
+            + self.png_chunk(
+                b"IDAT",
+                zlib.compress(b"\x00\x00"),
+            )
+            + self.png_chunk(b"IEND", b"")
+        )
+        histogram_without_palette = (
+            signature
+            + self.png_chunk(b"IHDR", header)
+            + self.png_chunk(b"hIST", b"")
+            + self.png_chunk(
+                b"IDAT",
+                zlib.compress(b"\x00\x00\x00\x00"),
+            )
+            + self.png_chunk(b"IEND", b"")
+        )
+        invalid_background = (
+            signature
+            + self.png_chunk(b"IHDR", header)
+            + self.png_chunk(b"bKGD", b"")
+            + self.png_chunk(
+                b"IDAT",
+                zlib.compress(b"\x00\x00\x00\x00"),
+            )
+            + self.png_chunk(b"IEND", b"")
+        )
+        valid_image_data = self.png_chunk(
+            b"IDAT",
+            zlib.compress(b"\x00\x00\x00\x00"),
+        )
+        invalid_text_chunks = {
+            "text-null": self.png_chunk(
+                b"tEXt",
+                b"k\0a\0b",
+            ),
+            "compressed-text-null": self.png_chunk(
+                b"zTXt",
+                b"k\0\0" + zlib.compress(b"a\0b"),
+            ),
+            "international-text-null": self.png_chunk(
+                b"iTXt",
+                b"k\0\0\0\0\0a\0b",
+            ),
+            "international-language": self.png_chunk(
+                b"iTXt",
+                b"k\0\0\0-\0\0text",
+            ),
+        }
+        corruptions = {
+            "header-only": self.png_header(1, 1),
+            "crc": bytes(corrupt_crc),
+            "invalid-idat": invalid_idat,
+            "misordered-transparency": misordered_transparency,
+            "background-before-palette": (
+                background_before_palette
+            ),
+            "histogram-without-palette": (
+                histogram_without_palette
+            ),
+            "invalid-background": invalid_background,
+            "missing-iend": valid[:-12],
+            "trailing-data": valid + b"\x00",
+        }
+        for label, text_chunk in invalid_text_chunks.items():
+            corruptions[label] = (
+                signature
+                + self.png_chunk(b"IHDR", header)
+                + text_chunk
+                + valid_image_data
+                + self.png_chunk(b"IEND", b"")
+            )
+
+        with tempfile.TemporaryDirectory() as temporary:
+            for label, data in corruptions.items():
+                with self.subTest(label=label):
+                    path = Path(temporary) / f"{label}.png"
+                    path.write_bytes(data)
+                    with self.assertRaises(SystemExit):
+                        builder.png_metadata(path)
+
+    def test_gif_parser_rejects_corrupt_structure(
+        self,
+    ) -> None:
+        specification = importlib.util.spec_from_file_location(
+            "htmlify_asset_builder_corrupt_gif",
+            BUILD_SCRIPT,
+        )
+        if specification is None:
+            self.fail("Could not load the asset builder")
+        if specification.loader is None:
+            self.fail("Asset builder has no loader")
+
+        builder = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(builder)
+        valid = self.minimal_gif(1, 1)
+        descriptor = valid.find(b"\x2c")
+        self.assertNotEqual(descriptor, -1)
+        screen_with_table = valid[:19]
+        no_color_table = bytearray(valid)
+        no_color_table[10] = 0
+        del no_color_table[13:19]
+        invalid_lzw = valid.replace(
+            b"\x02\x02\x4c\x01\x00",
+            b"\x02\x03xyz\x00",
+            1,
+        )
+        reserved_descriptor = bytearray(valid)
+        reserved_descriptor[descriptor + 9] = 0x18
+        conflicting_loop = (
+            valid[:19]
+            + b"\x21\xff\x0bNETSCAPE2.0"
+            + b"\x03\x01\x01\x00\x00"
+            + valid[19:]
+        )
+        invalid_application_identifier = (
+            valid[:19]
+            + b"\x21\xff\x0b"
+            + b"\x00" * 11
+            + b"\x00"
+            + valid[19:]
+        )
+        invalid_transparent_index = valid.replace(
+            b"\x21\xf9\x04\x00\x64\x00\x00\x00",
+            b"\x21\xf9\x04\x01\x64\x00\x02\x00",
+            1,
+        )
+        invalid_plain_text = (
+            valid[:descriptor]
+            + b"\x21\x01\x0c"
+            + b"\x00\x00\x00\x00\x01\x00\x01\x00"
+            + b"\x01\x01\xff\xff\x00"
+            + valid[descriptor:]
+        )
+        nonascii_plain_text = (
+            valid[:descriptor]
+            + b"\x21\x01\x0c"
+            + b"\x00\x00\x00\x00\x01\x00\x01\x00"
+            + b"\x01\x01\x00\x01\x01\xff\x00"
+            + valid[descriptor:]
+        )
+        corruptions = {
+            "descriptor": valid[: descriptor + 5],
+            "extension": (
+                screen_with_table + b"\x21\xfe\x03abc\x3b"
+            ),
+            "no-color-table": bytes(no_color_table),
+            "invalid-lzw": invalid_lzw,
+            "reserved-descriptor": bytes(reserved_descriptor),
+            "conflicting-loop": conflicting_loop,
+            "invalid-application-identifier": (
+                invalid_application_identifier
+            ),
+            "invalid-transparent-index": invalid_transparent_index,
+            "invalid-plain-text": invalid_plain_text,
+            "nonascii-plain-text": nonascii_plain_text,
+            "no-frames": screen_with_table + b"\x3b",
+            "missing-trailer": valid[:-1],
+            "trailing-data": valid + b"\x00",
+        }
+
+        with tempfile.TemporaryDirectory() as temporary:
+            valid_path = Path(temporary) / "valid.gif"
+            valid_path.write_bytes(valid)
+            metadata = builder.gif_metadata(valid_path)
+            self.assertEqual(metadata.frame_count, 1)
+            self.assertEqual(metadata.delays, (100,))
+            self.assertTrue(metadata.loops_forever)
+
+            for label, data in corruptions.items():
+                with self.subTest(label=label):
+                    path = Path(temporary) / f"{label}.gif"
+                    path.write_bytes(data)
+                    with self.assertRaises(SystemExit):
+                        builder.gif_metadata(path)
+
+    def test_asset_check_rejects_stale_source_fingerprint(
+        self,
+    ) -> None:
+        specification = importlib.util.spec_from_file_location(
+            "htmlify_asset_builder_fingerprint",
+            BUILD_SCRIPT,
+        )
+        if specification is None:
+            self.fail("Could not load the asset builder")
+        if specification.loader is None:
+            self.fail("Asset builder has no loader")
+
+        builder = importlib.util.module_from_spec(specification)
+        specification.loader.exec_module(builder)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            asset = Path(temporary) / "social-preview.png"
+            source = ASSETS / "social-preview.png"
+            asset.write_bytes(source.read_bytes())
+            fingerprint = builder.source_fingerprint()
+            builder.validate_source_stamp(asset, fingerprint)
+            with self.assertRaises(SystemExit):
+                builder.validate_source_stamp(
+                    asset,
+                    "0" * len(fingerprint),
+                )
+
     def test_evidence_lock_matches_reader_surfaces(
         self,
     ) -> None:
         lock = read_json(
-            EXAMPLES / "evidence-lock.gpt.json"
+            EXAMPLES / "evidence-lock.json"
         )
         for relative_path, expected in lock["files"].items():
             actual = sha256(ROOT / relative_path)
@@ -626,38 +915,6 @@ class EvidenceTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
 
     @staticmethod
-    def png_dimensions(path: Path) -> tuple[int, int]:
-        data = path.read_bytes()
-        if data[:8] != b"\x89PNG\r\n\x1a\n":
-            raise AssertionError(f"Not a PNG: {path}")
-        return struct.unpack(">II", data[16:24])
-
-    @staticmethod
-    def gif_dimensions(path: Path) -> tuple[int, int]:
-        data = path.read_bytes()
-        if data[:6] not in (b"GIF87a", b"GIF89a"):
-            raise AssertionError(f"Not a GIF: {path}")
-        return struct.unpack("<HH", data[6:10])
-
-    @staticmethod
-    def gif_delays(path: Path) -> list[int]:
-        data = path.read_bytes()
-        marker = b"\x21\xf9\x04"
-        delays = []
-        offset = 0
-        while True:
-            offset = data.find(marker, offset)
-            if offset == -1:
-                break
-            delays.append(
-                struct.unpack("<H", data[offset + 4 : offset + 6])[
-                    0
-                ]
-            )
-            offset += len(marker)
-        return delays
-
-    @staticmethod
     def png_header(width: int, height: int) -> bytes:
         return (
             b"\x89PNG\r\n\x1a\n"
@@ -666,8 +923,52 @@ class EvidenceTest(unittest.TestCase):
         )
 
     @staticmethod
+    def png_chunk(chunk_type: bytes, data: bytes) -> bytes:
+        checksum = zlib.crc32(chunk_type + data)
+        checksum &= 0xFFFFFFFF
+        return (
+            struct.pack(">I", len(data))
+            + chunk_type
+            + data
+            + struct.pack(">I", checksum)
+        )
+
+    @staticmethod
+    def minimal_png(width: int, height: int) -> bytes:
+        header = (
+            struct.pack(">II", width, height)
+            + b"\x08\x02\x00\x00\x00"
+        )
+        pixels = zlib.compress(b"\x00\x00\x00\x00")
+        return (
+            b"\x89PNG\r\n\x1a\n"
+            + EvidenceTest.png_chunk(b"IHDR", header)
+            + EvidenceTest.png_chunk(b"IDAT", pixels)
+            + EvidenceTest.png_chunk(b"IEND", b"")
+        )
+
+    @staticmethod
     def gif_header(width: int, height: int) -> bytes:
         return b"GIF89a" + struct.pack("<HH", width, height)
+
+    @staticmethod
+    def minimal_gif(width: int, height: int) -> bytes:
+        screen = (
+            b"GIF89a"
+            + struct.pack("<HH", width, height)
+            + b"\x80\x00\x00"
+            + b"\x00\x00\x00\xff\xff\xff"
+        )
+        loop = b"\x21\xff\x0bNETSCAPE2.0\x03\x01\x00\x00\x00"
+        control = b"\x21\xf9\x04\x00\x64\x00\x00\x00"
+        descriptor = (
+            b"\x2c"
+            + b"\x00\x00\x00\x00"
+            + struct.pack("<HH", width, height)
+            + b"\x00"
+        )
+        image_data = b"\x02\x02\x4c\x01\x00"
+        return screen + loop + control + descriptor + image_data + b"\x3b"
 
     @staticmethod
     def contrast_ratio(

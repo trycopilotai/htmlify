@@ -7,26 +7,24 @@ renderings. The formal version preserves source order; the
 rich version reorganizes the same facts around the
 document's useful visual structure.
 
-| Shape                | Source                                                  | Formal                                                | Rich                                                |
-| -------------------- | ------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------- |
-| Publication timeline | [Markdown](showcase/publication-sprint/source.gpt.md)   | [HTML](showcase/publication-sprint/formal.gpt.html)   | [HTML](showcase/publication-sprint/rich.gpt.html)   |
-| System control path  | [Markdown](showcase/control-plane-status/source.gpt.md) | [HTML](showcase/control-plane-status/formal.gpt.html) | [HTML](showcase/control-plane-status/rich.gpt.html) |
-| Design progression   | [Markdown](showcase/design-evolution/source.gpt.md)     | [HTML](showcase/design-evolution/formal.gpt.html)     | [HTML](showcase/design-evolution/rich.gpt.html)     |
+| Shape                | Source                                              | Formal                                            | Rich                                            |
+| -------------------- | --------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------- |
+| Publication timeline | [Markdown](showcase/publication-sprint/source.md)   | [HTML](showcase/publication-sprint/formal.html)   | [HTML](showcase/publication-sprint/rich.html)   |
+| System control path  | [Markdown](showcase/control-plane-status/source.md) | [HTML](showcase/control-plane-status/formal.html) | [HTML](showcase/control-plane-status/rich.html) |
+| Design progression   | [Markdown](showcase/design-evolution/source.md)     | [HTML](showcase/design-evolution/formal.html)     | [HTML](showcase/design-evolution/rich.html)     |
 
 Each rich showcase also retains the exact agent version,
 invocation, input commit, skill hash, output hashes, edit
 state, release visual QA, and repository-relative run
 record:
 
-- [Publication sprint manifest](showcase/publication-sprint/manifest.gpt.json)
+- [Publication sprint manifest](showcase/publication-sprint/manifest.json)
+  and [final run record](showcase/publication-sprint/run.md)
+- [Control-plane manifest](showcase/control-plane-status/manifest.json)
   and
-  [final run record](showcase/publication-sprint/run.gpt.md)
-- [Control-plane manifest](showcase/control-plane-status/manifest.gpt.json)
-  and
-  [final run record](showcase/control-plane-status/run.gpt.md)
-- [Design-evolution manifest](showcase/design-evolution/manifest.gpt.json)
-  and
-  [final run record](showcase/design-evolution/run.gpt.md)
+  [final run record](showcase/control-plane-status/run.md)
+- [Design-evolution manifest](showcase/design-evolution/manifest.json)
+  and [final run record](showcase/design-evolution/run.md)
 
 The README animations are generated from these files in
 source → formal → rich order:
@@ -56,7 +54,7 @@ edit state.
 Run the evidence checks with:
 
 ```sh
-python3 tests/test_evidence.gpt.py
+python3 tests/test_evidence.py
 ```
 
 The PDF run exercised Chrome on macOS and produced one US
@@ -69,6 +67,6 @@ document-level overflow at 390 by 844 pixels. Its output is
 one model run, not a promise that every agent or model will
 make the same design choices.
 
-The [contrast audit](contrast-audit.gpt.json) records the
+The [contrast audit](contrast-audit.json) records the
 foreground/background pairs that the test suite holds to a
 4.5:1 minimum.

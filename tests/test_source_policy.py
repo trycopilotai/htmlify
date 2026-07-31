@@ -6,6 +6,7 @@ from __future__ import annotations
 import ast
 import json
 import re
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -16,7 +17,7 @@ SCRIPTS = ROOT / "skill" / "scripts"
 README = ROOT / "README.md"
 PACKAGE = ROOT / "skills" / "htmlify"
 COMPATIBILITY_PATH = ROOT / "skill"
-RELEASE_VERSION = "0.2.1"
+RELEASE_VERSION = "0.2.2"
 OPENAI_DEFAULT_PROMPT = (
     "Use $htmlify to turn this Markdown into a "
     "source-checked HTML decision surface."
@@ -43,6 +44,27 @@ def read_wrapped_yaml_string(
 
 
 class SourcePolicyTests(unittest.TestCase):
+    def test_public_repository_uses_plain_filenames(self) -> None:
+        result = subprocess.run(
+            ["git", "ls-files", "-z"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        )
+        markers = {b"claude", b"codex", b"gpt"}
+        for relative_path in result.stdout.split(b"\0"):
+            if not relative_path:
+                continue
+            basename = relative_path.rsplit(b"/", 1)[-1]
+            segments = set(basename.lower().split(b"."))
+            self.assertFalse(
+                segments & markers,
+                relative_path.decode(
+                    "utf-8",
+                    errors="backslashreplace",
+                ),
+            )
+
     def test_dual_product_package_contract(self) -> None:
         canonical_skill = PACKAGE / "SKILL.md"
         openai_yaml = PACKAGE / "agents" / "openai.yaml"

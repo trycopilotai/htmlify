@@ -3,10 +3,10 @@
 This example turns a fictional release-readiness review into
 a single decision surface.
 
-- [Source Markdown](release-readiness.gpt.md)
+- [Source Markdown](release-readiness.md)
 - [Rendered HTML](index.html)
-- [Final run record](run.gpt.md)
-- [Evidence manifest](manifest.gpt.json)
+- [Final run record](run.md)
+- [Evidence manifest](manifest.json)
 
 The page places the source's hold decision, four required
 gates, and milestone sequence in the first viewport.
