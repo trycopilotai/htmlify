@@ -255,7 +255,8 @@ def _inline(text: str) -> str:
         label = _apply_emphasis(label)
         href = _unescape_pipe_backslashes(match.group(2))
         if _safe_href(href):
-            escaped_href = html.escape(href, quote=True)
+            emitted_href = href.replace("\\", "%5C")
+            escaped_href = html.escape(emitted_href, quote=True)
             rendered = '<a href="{}">{}</a>'.format(
                 escaped_href,
                 label,
