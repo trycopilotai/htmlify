@@ -258,7 +258,7 @@ compatibility case are the release's success metric. See
 
 ## License
 
-MIT. See [`LICENSE`](LICENSE).
+MIT license. See [`LICENSE`](LICENSE).
 
 ## Not affiliated with GitHub
 
