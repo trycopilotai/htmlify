@@ -10,8 +10,8 @@ While the repository is private, authorized collaborators
 should open an issue in this private repository with
 `[security]` at the start of its title. That issue is
 visible only to people who can access the private
-repository. After the repository is public, use
-**Security** → **Report a vulnerability**.
+repository. After the repository is public, use **Security**
+→ **Report a vulnerability**.
 
 Do not open a public issue for a credential, private-data
 disclosure, unsafe link, command-execution path, or
