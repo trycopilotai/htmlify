@@ -36,8 +36,8 @@ ImageMagick:
 make check
 ```
 
-Rebuilding the screenshots and animations requires Chrome
-or Chromium and ImageMagick:
+Rebuilding the screenshots and animations requires Chrome or
+Chromium and ImageMagick:
 
 ```sh
 make assets

@@ -1,8 +1,8 @@
 {
   "files": {
-    "README.md": "015d1cdded9d8c977f918773a9cd185583c2a48ea3e94cc837904da5f5fd4131",
-    "CONTRIBUTING.md": "1af9e1191fceae209919c081d7c7231f7bbb210887897b2cffe1aff0b8a41d42",
-    "SECURITY.md": "5c1a28800389265a76df9b2c9d074cfa485411daaed8e9bfb1a97b7be9d88358",
+    "README.md": "c936d0524776dc5be551384a92aec21580c3518b210d287b62c26b7c1ee27a05",
+    "CONTRIBUTING.md": "f41131dcc8e80c7a48b659af6beeca1e95c9bd62f1f43212201928cfe2d04f52",
+    "SECURITY.md": "b2e237113aa2cd1d07342ed7caba543ee2aa0ef20c17e191598af709a2c7063c",
     "LICENSE": "d34103d8f079b5fc8ddcee7539f3b685280ccb6e402dc137e7874c8436b97be4",
     "skills/htmlify/SKILL.md": "a4d310b9b9a621d31ac1bcf5cd7fafcc1a3dadb4ded9704aaaf0d8185d64c8a7",
     "skills/htmlify/agents/openai.yaml": "243d8863353d2896a2e2a78ca5baa9c31113f02fb671d13c8de7401f243e6b26",
