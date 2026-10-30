@@ -4,9 +4,13 @@ Turn dense Markdown into deterministic formal HTML or a
 source-checked rich decision surface, with optional PDF
 export.
 
+---
+
 [![auto-lint-pr](https://github.com/trycopilotai/htmlify/actions/workflows/auto-lint-pr.yml/badge.svg)](https://github.com/trycopilotai/htmlify/actions/workflows/auto-lint-pr.yml)
 [![check](https://github.com/trycopilotai/htmlify/actions/workflows/check.yml/badge.svg)](https://github.com/trycopilotai/htmlify/actions/workflows/check.yml)
 [![lint](https://github.com/trycopilotai/htmlify/actions/workflows/lint.yml/badge.svg)](https://github.com/trycopilotai/htmlify/actions/workflows/lint.yml)
+
+---
 
 `htmlify` gives an agent two explicit modes:
 
